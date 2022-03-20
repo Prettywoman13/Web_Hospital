@@ -1,5 +1,7 @@
 from flask import Flask, render_template
 
+from forms.login import LoginForm
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 
@@ -10,7 +12,8 @@ def main():
 
 @app.route("/login")
 def login():
-    return render_template("HTML/login.html")
+    form = LoginForm()
+    return render_template("HTML/login.html", form=form)
 
 
 if __name__ == '__main__':

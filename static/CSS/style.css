@@ -1,0 +1,12 @@
+body {
+    margin: 0;
+}
+
+.box-field {
+    padding: 5% 5%;
+    margin-top: 20%;
+    justify-content: center;
+    text-align: center;
+    box-shadow: 1px 1px 5px gray;
+    border-radius: 15px;
+}
