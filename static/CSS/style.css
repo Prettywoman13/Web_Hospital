@@ -2,6 +2,19 @@ body {
     margin: 0;
 }
 
+.nav-link {
+    padding: 7px 7px;
+    box-shadow: 1px 1px 5px 1px #444;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #2F80ED;
+    margin: 5px;
+}
+
+span {
+    color: #333333;
+}
+
 .box-field {
     padding: 5% 5%;
     margin-top: 20%;

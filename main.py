@@ -23,5 +23,10 @@ def registration():
     return render_template("HTML/registration.html", form=form)
 
 
+@app.route("/")
+def index():
+    return render_template("HTML/index.html", title="Главная страница")
+
+
 if __name__ == '__main__':
     main()
