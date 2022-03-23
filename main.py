@@ -8,7 +8,7 @@ app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 
 
 def main():
-    app.run()
+    app.run(debug=True)
 
 
 @app.route("/login")
