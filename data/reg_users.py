@@ -1,10 +1,11 @@
 import datetime
 import sqlalchemy
+from werkzeug.security import generate_password_hash
 from .db_session import SqlAlchemyBase
 
 
 class Reg_User(SqlAlchemyBase):
-    __tablename__ = 'reg3_users'
+    __tablename__ = 'reg_users'
 
     id = sqlalchemy.Column(sqlalchemy.Integer,
                            primary_key=True, autoincrement=True, index=True)
@@ -19,7 +20,5 @@ class Reg_User(SqlAlchemyBase):
     oms_series = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     oms_number = sqlalchemy.Column(sqlalchemy.String, nullable=False)
 
-
-
-    created_date = sqlalchemy.Column(sqlalchemy.DateTime,
-                                     default=datetime.datetime.now)
+    def set_hash_psw(self, password):
+        self.hashed_password = generate_password_hash(password)

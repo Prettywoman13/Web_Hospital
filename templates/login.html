@@ -7,6 +7,7 @@
     <link href="static/CSS/style.css" rel="stylesheet">
     <title>Авторизация</title>
 </head>
+{% block content %}
 <body>
     <div class="container">
         <div class="box-field">
@@ -15,28 +16,30 @@
                     <h3>Название сайта</h3>
                 </div>
             </div>
+            <form method="POST" action="">
+                {{ form.hidden_tag() }}
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
 
-            <div class="row justify-content-center">
-                <div class="col-md-6">
-                    <br>
-                    {{ form.email(class="form-control", type="email", placeholder="Email") }}
+                    </div>
                 </div>
-            </div>
 
-            <div class="row justify-content-center">
-                <div class="col-md-6">
-                    <br>
-                    {{ form.password(class="form-control", type="password", placeholder="Пароль") }}
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <br>
+                        {{ form.password(class="form-control", type="password", placeholder="Пароль") }}
+                    </div>
                 </div>
-            </div>
 
-            <div class="row justify-content-left">
-                <div class="col-md">
-                    <br>
-                    {{ form.submit(class="submit", class="btn btn-primary") }}
+                <div class="row justify-content-left">
+                    <div class="col-md">
+                        <br>
+                        {{ form.submit(class="submit", class="btn btn-primary") }}
+                    </div>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 </body>
+{% endblock %}
 </html>

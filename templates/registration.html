@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Регистрация</h1>
+<form action="" method="post">
+    {{ form.hidden_tag() }}
+
+        <div class="row justify-content-center">
+                    <div class="col-md-6">
+                            {{ form.email.label }}<br>
+                            {{ form.email(class="form-control", type="email") }}<br>
+                            {% for error in form.email.errors %}
+                                <p class="alert alert-danger" role="alert">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                    </div>
+                </div>
+
+
+
+        <div class="row justify-content-center">
+                    <div class="col-md-6">
+                            {{ form.password.label }}<br>
+                            {{ form.password(class="form-control", type="password") }}<br>
+                            {% for error in form.password.errors %}
+                                <p class="alert alert-danger" role="alert">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                    </div>
+        </div>
+
+
+
+        <div class="row justify-content-center">
+                 <div class="col-md-6">
+                            {{ form.password_rep.label }}<br>
+                            {{ form.password_rep(class="form-control", type="password") }}<br>
+                            {% for error in form.password_rep.errors %}
+                                <p class="alert alert-danger" role="alert">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                </div>
+        </div>
+
+
+
+        <div class="row justify-content-center">
+                <div class="col-md-6">
+                            {{ form.surname.label }}<br>
+                            {{ form.surname(class="form-control") }}<br>
+                            {% for error in form.surname.errors %}
+                                <p class="alert alert-danger" role="alert">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                </div>
+        </div>
+
+
+
+   <div class="row justify-content-center">
+                <div class="col-md-6">
+                            {{ form.name.label }}<br>
+                            {{ form.name(class="form-control") }}<br>
+                            {% for error in form.name.errors %}
+                                <p class="alert alert-danger" role="alert">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                </div>
+        </div>
+
+
+    <div class="row justify-content-center">
+                <div class="col-md-6">
+                            {{ form.middle_name.label }}<br>
+                            {{ form.middle_name(class="form-control") }}<br>
+                            {% for error in form.middle_name.errors %}
+                                <p class="alert alert-danger" role="alert">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                </div>
+        </div>
+
+
+
+
+    <div class="row justify-content-center">
+                <div class="col-md-6">
+                            {{ form.snils.label }}<br>
+                            {{ form.snils(class="form-control") }}<br>
+                            {% for error in form.snils.errors %}
+                                <p class="alert alert-danger" role="alert">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                </div>
+        </div>
+
+
+
+
+    <div class="row justify-content-center">
+                <div class="col-md-6">
+                            {{ form.number_phone.label }}<br>
+                            {{ form.number_phone(class="form-control") }}<br>
+                            {% for error in form.number_phone.errors %}
+                                <p class="alert alert-danger" role="alert">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                </div>
+        </div>
+
+
+    <div class="row justify-content-center">
+                <div class="col-md-6">
+                            {{ form.series_oms.label }}<br>
+                            {{ form.series_oms(class="form-control") }}<br>
+                            {% for error in form.series_oms.errors %}
+                                <p class="alert alert-danger" role="alert">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                </div>
+        </div>
+
+    <div class="row justify-content-center">
+                <div class="col-md-6">
+                            {{ form.number_oms.label }}<br>
+                            {{ form.number_oms(class="form-control") }}<br>
+                            {% for error in form.number_oms.errors %}
+                                <p class="alert alert-danger" role="alert">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                </div>
+        </div>
+
+    <div class="row justify-content-center">
+                <div class="col-md-6">
+    <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+    {{message}}
+                </div>
+    </div
+</form>
+{% endblock %}
