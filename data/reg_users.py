@@ -1,10 +1,11 @@
 import datetime
 import sqlalchemy
-from werkzeug.security import generate_password_hash
+from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
 from .db_session import SqlAlchemyBase
 
 
-class Reg_User(SqlAlchemyBase):
+class Reg_User(SqlAlchemyBase, UserMixin):
     __tablename__ = 'reg_users'
 
     id = sqlalchemy.Column(sqlalchemy.Integer,
@@ -20,5 +21,12 @@ class Reg_User(SqlAlchemyBase):
     oms_series = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     oms_number = sqlalchemy.Column(sqlalchemy.String, nullable=False)
 
+
     def set_hash_psw(self, password):
         self.hashed_password = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.hashed_password, password)
+
+    def get_name(self):
+        return self.name

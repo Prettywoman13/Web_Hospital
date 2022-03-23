@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+<body>
+профиль пользователя {{ user }}
+
+ <a class="nav-link" href="{{ url_for('logout') }}">Выйти из аккаунта</a>
+</body>
+{% endblock %}
