@@ -57,6 +57,15 @@ def registration():
         if form.password.data != form.password_rep.data:
             return render_template('registration.html', title='Регистрация', form=form,
                                    message="Пароли не совпадают")
+
+        if form.validate_number_phone(form.number_phone):
+            return render_template('registration.html', title='Регистрация', form=form,
+                                   message="Неверный формат ввода телефона")
+
+        if form.validate_snils(form.snils):
+            return render_template('registration.html', title='Регистрация', form=form,
+                                   message="Неверный формат ввода СНИЛС")
+
         db_sess = db_session.create_session()
         if db_sess.query(Reg_User).filter(Reg_User.email == form.email.data).first():
             return render_template('registration.html', title='Регистрация', form=form,
