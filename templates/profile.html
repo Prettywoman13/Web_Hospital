@@ -1,9 +1,21 @@
 {% extends "base.html" %}
 
 {% block content %}
-<body>
-профиль пользователя {{ user }}
-
- <a class="nav-link" href="{{ url_for('logout') }}">Выйти из аккаунта</a>
-</body>
+<div class="row justify-content-center">
+    <div class="col-12 col-sm-10 col-md-9 col-lg-6">
+         <div class="card">
+             <div class="card-body">
+                <h5>{{ user.get_fio() }}</h5>
+                <hr>
+                <h5>Email: {{ user.get_email() }}</h5>
+                <h5>Номер телефона: {{ user.get_phone() }}</h5>
+                <h5>СНИЛС: {{ user.get_snils() }}</h5>
+                {% if user.get_oms_series() != "" %}
+                    <h5>Серия ОМС: {{ user.get_oms_series() }}</h5>
+                {% endif %}
+                <h5>Номер ОМС: {{ user.get_oms_number() }}</h5>
+             </div>
+         </div>
+    </div>
+</div>
 {% endblock %}

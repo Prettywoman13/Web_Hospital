@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, redirect
+from flask import Flask, render_template, url_for, redirect, session
 
 from data import db_session
 from data.reg_users import Reg_User
@@ -34,14 +34,14 @@ def logout():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for("profile"))
+        return redirect(url_for("index"))
     form = LoginForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         user = db_sess.query(Reg_User).filter(Reg_User.email == form.email.data).first()
         if user and user.check_password(form.password.data):
             login_user(user)
-            return redirect(url_for("profile"))
+            return redirect(url_for("index"))
         return render_template('login.html', message="Неправильный логин или пароль", form=form)
     return render_template('login.html', title='Авторизация', form=form)
 
@@ -80,13 +80,13 @@ def registration():
 @app.route("/profile", methods=['POST', 'GET'])
 @login_required
 def profile():
-    user = current_user.get_name()
-    return render_template('profile.html', user=user)
+    user = current_user
+    return render_template('profile.html', user=user, is_auth=current_user.is_authenticated)
 
 
 @app.route("/")
 def index():
-    return render_template("index.html", title="Главная страница")
+    return render_template("index.html", title="Главная страница", is_auth=current_user.is_authenticated)
 
 
 if __name__ == '__main__':
