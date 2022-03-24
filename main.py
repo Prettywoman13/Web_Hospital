@@ -1,9 +1,4 @@
 import base64
-from io import BytesIO
-from tempfile import TemporaryFile
-from typing import io
-
-import requests
 from flask import Flask, render_template, url_for, redirect, session, request
 
 from data import db_session
@@ -22,7 +17,7 @@ app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 
 def main():
     db_session.global_init("db/users.db")
-    app.run(debug=True)
+    app.run(debug=True, port=8080)
 
 
 @login_manager.user_loader
@@ -112,10 +107,6 @@ def create_news_page():
                            title="Создать новость",
                            is_auth=current_user.is_authenticated,
                            form=form)
-
-
-def last_five_news(news):
-    return news[-1:-6]
 
 
 @app.route("/")

@@ -19,6 +19,10 @@ span {
     border-radius: 15px;
 }
 
+img {
+    width: 100%;
+}
+
 .box-field {
     padding: 5% 5%;
     margin-top: 10%;
