@@ -1,9 +1,17 @@
-from flask import Flask, render_template, url_for, redirect, session
+import base64
+from io import BytesIO
+from tempfile import TemporaryFile
+from typing import io
+
+import requests
+from flask import Flask, render_template, url_for, redirect, session, request
 
 from data import db_session
+from data.news import News
 from data.reg_users import Reg_User
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from forms.login import LoginForm
+from forms.news_form import NewsForm
 from forms.registration import RegistraionForm
 
 app = Flask(__name__)
@@ -13,7 +21,6 @@ app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 
 
 def main():
-
     db_session.global_init("db/users.db")
     app.run(debug=True)
 
@@ -60,14 +67,14 @@ def registration():
             return render_template('registration.html', title='Регистрация', form=form,
                                    message="Такой пользователь уже есть")
         new_user = Reg_User(
-            email = form.email.data,
-            name = form.name.data,
-            surname = form.surname.data,
-            patronymic = form.middle_name.data,
-            pnone_number = form.number_phone.data,
-            snils = form.snils.data,
-            oms_series = form.series_oms.data,
-            oms_number = form.number_oms.data
+            email=form.email.data,
+            name=form.name.data,
+            surname=form.surname.data,
+            patronymic=form.middle_name.data,
+            pnone_number=form.number_phone.data,
+            snils=form.snils.data,
+            oms_series=form.series_oms.data,
+            oms_number=form.number_oms.data
         )
         new_user.set_hash_psw(form.password.data)
 
@@ -84,9 +91,41 @@ def profile():
     return render_template('profile.html', user=user, is_auth=current_user.is_authenticated)
 
 
+@app.route("/admin/create_news", methods=['GET', 'POST'])
+def create_news_page():
+    form = NewsForm()
+
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+
+        new_news = News()
+
+        new_news.title = form.title.data
+        new_news.description = form.description.data
+        new_news.image = request.files["img1"].stream.read()
+
+        db_sess.add(new_news)
+        db_sess.commit()
+        return redirect(url_for('index'))
+
+    return render_template("create_news.html",
+                           title="Создать новость",
+                           is_auth=current_user.is_authenticated,
+                           form=form)
+
+
+def last_five_news(news):
+    return news[-1:-6]
+
+
 @app.route("/")
 def index():
-    return render_template("index.html", title="Главная страница", is_auth=current_user.is_authenticated)
+    db_sess = db_session.create_session()
+    news = db_sess.query(News).all()[-1:-6:-1]
+    for i in news:
+        i.image = base64.b64encode(i.image).decode("utf-8")
+
+    return render_template("index.html", title="Главная страница", is_auth=current_user.is_authenticated, news=news)
 
 
 if __name__ == '__main__':

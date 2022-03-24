@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="row">
+        <form method="post" action="" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        {{ form.title.label }}
+                        <br>
+                        {{ form.title(class="form-control") }}
+                    </div>
+                </div>
+
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <br>
+                        {{ form.description.label }}
+                        <br>
+                        {{ form.description(class="form-control") }}
+                    </div>
+                </div>
+
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <br>
+                        {{ form.img_picker.label }}
+                        <br>
+                        <input type="file" name="img1" class="form-control" accept=".jpg, .jpeg, .png">
+<!--                        {{ form.img_picker(class="form-control", accept=".jpg, .jpeg, .png") }}-->
+                    </div>
+                </div>
+
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <br>
+                        {{ form.submit(class="submit", class="btn btn-primary") }}
+                    </div>
+                </div>
+            </form>
+    </div>
+{% endblock %}
+4
