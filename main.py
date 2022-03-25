@@ -127,6 +127,15 @@ def index():
 
     return render_template("index.html", title="Главная страница", is_auth=current_user.is_authenticated, news=news)
 
+@app.errorhandler(401)
+def unlogin_user(e):
+    return 'ты не авторизован'
+
+
+@app.errorhandler(404)
+def unlogin_user(e):
+    return 'не та страница'
+
 
 if __name__ == '__main__':
     main()
