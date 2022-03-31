@@ -1,6 +1,7 @@
 import base64
-from flask import Flask, render_template, url_for, redirect, session, request
+from flask import Flask, render_template, url_for, redirect, session, request, blueprints
 from werkzeug.security import generate_password_hash
+from admin import admin_api
 from cfg import HOST
 from data import db_session
 from data.news import News
@@ -11,6 +12,7 @@ from forms.news_form import NewsForm
 from forms.registration import RegistraionForm
 
 app = Flask(__name__)
+app.register_blueprint(admin_api, url_prefix='/admin')
 login_manager = LoginManager()
 login_manager.init_app(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -99,29 +101,6 @@ def profile():
     return render_template('profile.html', user=user, is_auth=current_user.is_authenticated)
 
 
-@app.route("/admin/create_news", methods=['GET', 'POST'])
-def create_news_page():
-    form = NewsForm()
-
-    if form.validate_on_submit():
-        db_sess = db_session.create_session()
-
-        new_news = News()
-
-        new_news.title = form.title.data
-        new_news.description = form.description.data
-        new_news.image = request.files["img1"].stream.read()
-
-        db_sess.add(new_news)
-        db_sess.commit()
-        return redirect(url_for('index'))
-
-    return render_template("create_news.html",
-                           title="Создать новость",
-                           is_auth=current_user.is_authenticated,
-                           form=form)
-
-
 @app.route("/")
 def index():
     db_sess = db_session.create_session()
@@ -131,14 +110,15 @@ def index():
 
     return render_template("index.html", title="Главная страница", is_auth=current_user.is_authenticated, news=news)
 
+
 @app.errorhandler(401)
 def unlogin_user(e):
     return 'ты не авторизован'
 
 
-@app.errorhandler(404)
-def unlogin_user(e):
-    return 'не та страница'
+# @app.errorhandler(404)
+# def unlogin_user(e):
+#     return 'не та страница'
 
 
 if __name__ == '__main__':
