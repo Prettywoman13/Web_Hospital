@@ -22,14 +22,20 @@
                         {{ form.password(class="form-control", type="password", placeholder="Пароль") }}
                     </div>
                 </div>
-
+                <div class="row justify-content-center">
+                        <div class="col-md-6">
+                            {{ message }}
+                        </div>
+                </div>
                 <div class="row justify-content-left">
                     <div class="col-md">
                         <br>
                         {{ form.submit(class="submit", class="btn btn-primary") }}
                     </div>
                 </div>
+
             </form>
+
         </div>
     </div>
 {% endblock %}

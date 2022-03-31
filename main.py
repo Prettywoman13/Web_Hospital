@@ -1,5 +1,6 @@
 import base64
 from flask import Flask, render_template, url_for, redirect, session, request
+from werkzeug.security import generate_password_hash
 
 from data import db_session
 from data.news import News
@@ -17,7 +18,7 @@ app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 
 def main():
     db_session.global_init("db/users.db")
-    app.run(debug=True, port=8080)
+    app.run(debug=True, port=8020)
 
 
 @login_manager.user_loader
@@ -41,7 +42,10 @@ def login():
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         user = db_sess.query(Reg_User).filter(Reg_User.email == form.email.data).first()
-        if user and user.check_password(form.password.data):
+
+        if user is None:
+            return render_template('login.html', message="Такой учетной записи не существует.", form=form)
+        if user.check_password(form.password.data):
             login_user(user)
             return redirect(url_for("index"))
         return render_template('login.html', message="Неправильный логин или пароль", form=form)
