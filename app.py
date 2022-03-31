@@ -1,7 +1,7 @@
 import base64
 from flask import Flask, render_template, url_for, redirect, session, request
 from werkzeug.security import generate_password_hash
-
+from cfg import HOST
 from data import db_session
 from data.news import News
 from data.reg_users import Reg_User
@@ -18,7 +18,7 @@ app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 
 def main():
     db_session.global_init("db/users.db")
-    app.run(debug=True, port=8020)
+    app.run(debug=True, port=8020, host=HOST)
 
 
 @login_manager.user_loader
