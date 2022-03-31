@@ -1,6 +1,7 @@
-from flask import Flask, render_template, url_for, redirect, session, request
+from flask import Flask, render_template, url_for, redirect, session, request, jsonify
 from cfg import HOST, admin_id
 from data.news import News
+from flask_restful import reqparse, abort, Api, Resource
 from data import db_session
 from data.reg_users import Reg_User
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
@@ -8,11 +9,11 @@ from forms.login import LoginForm
 from forms.news_form import NewsForm
 from forms.registration import RegistraionForm
 from flask import Blueprint
-admin_api = Blueprint('admin_api', __name__, template_folder='templates')
-
+admin = Blueprint('admin_api', __name__, template_folder='templates')
+admin_api = Api(admin)
 
 @login_required
-@admin_api.route("/create_news", methods=['GET', 'POST'])
+@admin.route("/create_news", methods=['GET', 'POST'])
 def create_news_page():
     if current_user.is_authenticated:
         if session['_user_id'] != admin_id:
@@ -44,3 +45,17 @@ def create_news_page():
     return '''
     вы не зареганы
     '''
+
+
+class Patient(Resource):
+
+    def get(self, id):
+        # abort_if_news_not_found(news_id)
+        session = db_session.create_session()
+        user = session.query(Reg_User).get(id)
+        print(user.__dict__)
+        return jsonify({'user': user.to_dict(
+            only=('id', 'pnone_number'))})
+
+
+admin_api.add_resource(Patient, '/<id>')

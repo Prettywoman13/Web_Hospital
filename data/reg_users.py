@@ -1,11 +1,12 @@
 import datetime
 import sqlalchemy
 from flask_login import UserMixin
+from sqlalchemy_serializer import SerializerMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from .db_session import SqlAlchemyBase
 
 
-class Reg_User(SqlAlchemyBase, UserMixin):
+class Reg_User(SqlAlchemyBase, UserMixin, SerializerMixin):
     __tablename__ = 'reg_users'
 
     id = sqlalchemy.Column(sqlalchemy.Integer,

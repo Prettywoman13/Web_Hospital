@@ -1,7 +1,7 @@
 import base64
 from flask import Flask, render_template, url_for, redirect, session, request, blueprints
 from werkzeug.security import generate_password_hash
-from admin import admin_api
+from admin import admin
 from cfg import HOST
 from data import db_session
 from data.news import News
@@ -12,7 +12,7 @@ from forms.news_form import NewsForm
 from forms.registration import RegistraionForm
 
 app = Flask(__name__)
-app.register_blueprint(admin_api, url_prefix='/admin')
+app.register_blueprint(admin, url_prefix='/admin')
 login_manager = LoginManager()
 login_manager.init_app(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
