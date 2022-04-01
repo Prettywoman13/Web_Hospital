@@ -67,6 +67,12 @@ def create_doctor():
         else:
             form = RegistraionDoctorForm()
             if form.validate_on_submit():
+                if form.password.data != form.password_again.data:
+                    return render_template('admin_reg_doctor.html',
+                                           form=form,
+                                           is_auth=current_user.is_authenticated,
+                                           message='пароли не совпадают')
+
                 post(f'http://{HOST}:{PORT}/admin/create_doctor_api',
                      json={
                          'login': form.login.data,
@@ -99,13 +105,15 @@ class Doctor(Resource):
         print(all_args)
         new_doctor = Reg_Doctor(
         login=all_args['login'],
-        password = all_args['password'],
         name = all_args['name'],
         middle_name = all_args['middle_name'],
         surname = all_args['surname'],
         prof = all_args['prof'])
+        new_doctor.set_hash_psw(all_args['password'])
         db_sess.add(new_doctor)
         db_sess.commit()
+        return jsonify({'success': 'OK'})
+
 
 
 admin_api.add_resource(Doctor, '/create_doctor_api')
