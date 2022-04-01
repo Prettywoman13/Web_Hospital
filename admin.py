@@ -1,23 +1,24 @@
 from flask import Flask, render_template, url_for, redirect, session, request, jsonify
-from cfg import HOST, admin_id
+from requests import post
+
+from cfg import HOST, admin_id, PORT
 from data.news import News
-from requests import get, post
 from flask_restful import reqparse, abort, Api, Resource
 from data import db_session
 from data.reg_users import Reg_User
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from forms.login import LoginForm
 from forms.news_form import NewsForm
-from forms.registration import RegistraionForm
+from forms.reg_doctor import RegistraionDoctorForm
 from flask import Blueprint
 admin = Blueprint('admin_api', __name__, template_folder='templates')
 admin_api = Api(admin)
-parser = reqparse.RequestParser()
-parser.add_argument('doctor_id', required=True)
-parser.add_argument('first_name', required=True)
-parser.add_argument('second_name', required=True)
-parser.add_argument('last_name', required=True)
-parser.add_argument('prof', required=True)
+doctor_api_parser = reqparse.RequestParser()
+doctor_api_parser.add_argument('login', required=True)
+doctor_api_parser.add_argument('password', required=True)
+doctor_api_parser.add_argument('first_name', required=True)
+doctor_api_parser.add_argument('middle_name', required=True)
+doctor_api_parser.add_argument('surname', required=True)
+doctor_api_parser.add_argument('prof', required=True)
 
 
 @login_required
@@ -55,6 +56,29 @@ def create_news_page():
     '''
 
 
+@login_required
+@admin.route('/add_doctor', methods=['GET', 'POST'])
+def create_doctor():
+    if current_user.is_authenticated:
+        if session['_user_id'] != admin_id:
+            return '''
+            ошибка доступа, обратитесь к системному администратору
+            '''
+        else:
+            form = RegistraionDoctorForm()
+            if form.validate_on_submit():
+                post(f'http://{HOST}:{PORT}/admin/create_doctor_api',
+                     json={
+                         'login': form.login.data,
+                         'password': form.password.data,
+                         'first_name': form.name.data,
+                         'middle_name': form.middle_name.data,
+                         'surname': form.surname.data,
+                         'prof': form.prof.data})
+            return render_template('admin_reg_doctor.html', form=form)
+
+
+
 class Patient(Resource):
 
     def get(self, id):
@@ -71,11 +95,11 @@ class Doctor(Resource):
         pass
 
     def post(self):
-        all_args = parser.parse_args()
+        all_args = doctor_api_parser.parse_args()
         print(all_args)
 
 
-admin_api.add_resource(Doctor, '/create_doctor')
+admin_api.add_resource(Doctor, '/create_doctor_api')
 admin_api.add_resource(Patient, '/<id>')
 # post(
 #                 f'http://127.0.0.1:8020/admin/create_doctor',
