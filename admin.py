@@ -1,6 +1,6 @@
 from flask import Flask, render_template, url_for, redirect, session, request, jsonify
 from requests import post
-
+from data.doctor_model import Reg_Doctor
 from cfg import HOST, admin_id, PORT
 from data.news import News
 from flask_restful import reqparse, abort, Api, Resource
@@ -15,7 +15,7 @@ admin_api = Api(admin)
 doctor_api_parser = reqparse.RequestParser()
 doctor_api_parser.add_argument('login', required=True)
 doctor_api_parser.add_argument('password', required=True)
-doctor_api_parser.add_argument('first_name', required=True)
+doctor_api_parser.add_argument('name', required=True)
 doctor_api_parser.add_argument('middle_name', required=True)
 doctor_api_parser.add_argument('surname', required=True)
 doctor_api_parser.add_argument('prof', required=True)
@@ -71,12 +71,11 @@ def create_doctor():
                      json={
                          'login': form.login.data,
                          'password': form.password.data,
-                         'first_name': form.name.data,
+                         'name': form.name.data,
                          'middle_name': form.middle_name.data,
                          'surname': form.surname.data,
                          'prof': form.prof.data})
-            return render_template('admin_reg_doctor.html', form=form)
-
+            return render_template('admin_reg_doctor.html', form=form, is_auth=current_user.is_authenticated)
 
 
 class Patient(Resource):
@@ -96,18 +95,18 @@ class Doctor(Resource):
 
     def post(self):
         all_args = doctor_api_parser.parse_args()
+        db_sess = db_session.create_session()
         print(all_args)
+        new_doctor = Reg_Doctor(
+        login=all_args['login'],
+        password = all_args['password'],
+        name = all_args['name'],
+        middle_name = all_args['middle_name'],
+        surname = all_args['surname'],
+        prof = all_args['prof'])
+        db_sess.add(new_doctor)
+        db_sess.commit()
 
 
 admin_api.add_resource(Doctor, '/create_doctor_api')
 admin_api.add_resource(Patient, '/<id>')
-# post(
-#                 f'http://127.0.0.1:8020/admin/create_doctor',
-#                 json={
-#                     'doctor_id': 1,
-#                     'first_name': 'Андрей',
-#                     'second_name': 'Дмитриевич',
-#                     'last_name': 'Свечников',
-#                     'prof': 'Проктолог'
-#                 }
-#             )
