@@ -1,6 +1,7 @@
 from flask import Flask, render_template, url_for, redirect, session, request, jsonify
 from cfg import HOST, admin_id
 from data.news import News
+from requests import get, post
 from flask_restful import reqparse, abort, Api, Resource
 from data import db_session
 from data.reg_users import Reg_User
@@ -11,6 +12,13 @@ from forms.registration import RegistraionForm
 from flask import Blueprint
 admin = Blueprint('admin_api', __name__, template_folder='templates')
 admin_api = Api(admin)
+parser = reqparse.RequestParser()
+parser.add_argument('doctor_id', required=True)
+parser.add_argument('first_name', required=True)
+parser.add_argument('second_name', required=True)
+parser.add_argument('last_name', required=True)
+parser.add_argument('prof', required=True)
+
 
 @login_required
 @admin.route("/create_news", methods=['GET', 'POST'])
@@ -21,7 +29,7 @@ def create_news_page():
             ошибка доступа, обратитесь к системному администратору
             '''
         else:
-            print(session['_user_id'])
+
             form = NewsForm()
 
             if form.validate_on_submit():
@@ -58,4 +66,24 @@ class Patient(Resource):
             only=('id', 'pnone_number'))})
 
 
+class Doctor(Resource):
+    def get(self, id):
+        pass
+
+    def post(self):
+        all_args = parser.parse_args()
+        print(all_args)
+
+
+admin_api.add_resource(Doctor, '/create_doctor')
 admin_api.add_resource(Patient, '/<id>')
+# post(
+#                 f'http://127.0.0.1:8020/admin/create_doctor',
+#                 json={
+#                     'doctor_id': 1,
+#                     'first_name': 'Андрей',
+#                     'second_name': 'Дмитриевич',
+#                     'last_name': 'Свечников',
+#                     'prof': 'Проктолог'
+#                 }
+#             )
