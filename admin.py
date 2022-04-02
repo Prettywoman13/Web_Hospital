@@ -1,3 +1,5 @@
+import base64
+
 from flask import Flask, render_template, url_for, redirect, session, request, jsonify
 from requests import post, get, put
 from data.doctor_model import Reg_Doctor
@@ -19,6 +21,7 @@ doctor_api_parser.add_argument('name', required=True)
 doctor_api_parser.add_argument('middle_name', required=True)
 doctor_api_parser.add_argument('surname', required=True)
 doctor_api_parser.add_argument('prof', required=True)
+doctor_api_parser.add_argument('img', required=False)
 
 
 @login_required
@@ -72,7 +75,6 @@ def create_doctor():
                                            form=form,
                                            is_auth=current_user.is_authenticated,
                                            message='пароли не совпадают')
-
                 post(f'http://{HOST}:{PORT}/admin/doctor_api/1',
                      json={
                          'login': form.login.data,
@@ -80,7 +82,9 @@ def create_doctor():
                          'name': form.name.data,
                          'middle_name': form.middle_name.data,
                          'surname': form.surname.data,
-                         'prof': form.prof.data})
+                         'prof': form.prof.data,
+                         'img': str(request.files['img1'].stream.read())
+                     })
 
             return render_template('admin_reg_doctor.html', form=form, is_auth=current_user.is_authenticated)
     else:
@@ -148,12 +152,15 @@ class Doctor(Resource):
     def post(self, doctor_id):
         all_args = doctor_api_parser.parse_args()
         db_sess = db_session.create_session()
+
         new_doctor = Reg_Doctor(
             login=all_args['login'],
             name=all_args['name'],
             middle_name=all_args['middle_name'],
             surname = all_args['surname'],
-            prof = all_args['prof'])
+            prof = all_args['prof'],
+            image=all_args['img'].encode()
+            )
         new_doctor.set_hash_psw(all_args['password'])
         db_sess.add(new_doctor)
         db_sess.commit()

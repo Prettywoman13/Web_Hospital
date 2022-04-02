@@ -17,6 +17,7 @@ class Reg_Doctor(SqlAlchemyBase, UserMixin, SerializerMixin):
     middle_name = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     surname = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     prof = sqlalchemy.Column(sqlalchemy.String, nullable=False)
+    image = sqlalchemy.Column(sqlalchemy.BLOB, nullable=True, default=None)
 
     def set_hash_psw(self, password):
         self.password = generate_password_hash(password)
