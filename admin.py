@@ -9,19 +9,21 @@ from flask_restful import reqparse, abort, Api, Resource
 from data import db_session
 from data.reg_users import Reg_User
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+
+from forms.edit_doctor_validator import ChangeDoctorForm
 from forms.news_form import NewsForm
 from forms.reg_doctor import RegistraionDoctorForm
 from flask import Blueprint
 admin = Blueprint('admin', __name__, template_folder='templates')
 admin_api = Api(admin)
 doctor_api_parser = reqparse.RequestParser()
-doctor_api_parser.add_argument('login', required=True)
-doctor_api_parser.add_argument('password', required=True)
-doctor_api_parser.add_argument('name', required=True)
-doctor_api_parser.add_argument('middle_name', required=True)
-doctor_api_parser.add_argument('surname', required=True)
-doctor_api_parser.add_argument('prof', required=True)
-doctor_api_parser.add_argument('img', required=False)
+doctor_api_parser.add_argument('login')
+doctor_api_parser.add_argument('password')
+doctor_api_parser.add_argument('name')
+doctor_api_parser.add_argument('middle_name')
+doctor_api_parser.add_argument('surname')
+doctor_api_parser.add_argument('prof')
+doctor_api_parser.add_argument('img')
 
 
 @login_required
@@ -104,28 +106,25 @@ def change_doctor_data(doc_id):
             if doc_data.status_code != 200:
                 abort(doc_data.status_code)
             doc_data = doc_data.json()['doctor']
-            form = RegistraionDoctorForm(
-                login=doc_data['login'],
+            form = ChangeDoctorForm(
                 name=doc_data['name'],
                 surname=doc_data['surname'],
                 middle_name=doc_data['middle_name'],
                 prof=doc_data['prof'])
             if form.validate_on_submit():
+                img = base64.b64encode(request.files["img1"].stream.read())
                 put(f'http://{HOST}:{PORT}/admin/doctor_api/{doc_id}',
                     json={
-                        'login': form.login.data,
-                        'password': form.password.data,
                         'name': form.name.data,
                         'middle_name': form.middle_name.data,
                         'surname': form.surname.data,
-                        'prof': form.prof.data})
+                        'prof': form.prof.data,
+                        'img': str(img)
+                    })
+                print('all_correct')
             return render_template('change_doctor.html', form=form, is_auth=current_user.is_authenticated)
     else:
         abort(401)
-
-
-
-
 
 
 class Doctor(Resource):
@@ -147,6 +146,7 @@ class Doctor(Resource):
 
     def post(self, doctor_id):
         all_args = doctor_api_parser.parse_args()
+        print(all_args)
         db_sess = db_session.create_session()
         img = bytes(all_args['img'], encoding='utf-8')[2:-1]
         new_doctor = Reg_Doctor(
@@ -171,7 +171,10 @@ class Doctor(Resource):
         doctor_data.surname = all_args['surname']
         doctor_data.middle_name = all_args['middle_name']
         doctor_data.prof = all_args['prof']
+        img = bytes(all_args['img'], encoding='utf-8')[2:-1]
+        doctor_data.image = img
         db_sess.commit()
+
 
     def delete(self, doctor_id):
         db_sess = db_session.create_session()
