@@ -111,6 +111,7 @@ def index():
         i.image = base64.b64encode(i.image).decode("utf-8")
 
     doctors = requests.get(f'http://{HOST}:{PORT}/admin/doctor_api/doctors').json()
+    print(doctors)
     return render_template("index.html",
                            title="Главная страница",
                            is_auth=current_user.is_authenticated,

@@ -75,6 +75,8 @@ def create_doctor():
                                            form=form,
                                            is_auth=current_user.is_authenticated,
                                            message='пароли не совпадают')
+                img = base64.b64encode(request.files["img1"].stream.read())
+                print(type(img))
                 post(f'http://{HOST}:{PORT}/admin/doctor_api/1',
                      json={
                          'login': form.login.data,
@@ -83,7 +85,7 @@ def create_doctor():
                          'middle_name': form.middle_name.data,
                          'surname': form.surname.data,
                          'prof': form.prof.data,
-                         'img': str(request.files['img1'].stream.read())
+                         'img': str(img),
                      })
 
             return render_template('admin_reg_doctor.html', form=form, is_auth=current_user.is_authenticated)
@@ -123,14 +125,7 @@ def change_doctor_data(doc_id):
 
 
 
-class Patient(Resource):
 
-    def get(self, id):
-        session = db_session.create_session()
-        user = session.query(Reg_User).get(id)
-        print(user.__dict__)
-        return jsonify({'user': user.to_dict(
-            only=('id', 'pnone_number'))})
 
 
 class Doctor(Resource):
@@ -139,6 +134,7 @@ class Doctor(Resource):
         doc = db_sess.query(Reg_Doctor).filter(Reg_Doctor.id == doctor_id).first()
         if not doc:
             abort(404, message=f"Doctor with id:{doctor_id} not found")
+
         return jsonify(
             {'doctor': {
                 'login': doc.login,
@@ -152,15 +148,16 @@ class Doctor(Resource):
     def post(self, doctor_id):
         all_args = doctor_api_parser.parse_args()
         db_sess = db_session.create_session()
-
+        img = bytes(all_args['img'], encoding='utf-8')[2:-1]
         new_doctor = Reg_Doctor(
             login=all_args['login'],
             name=all_args['name'],
             middle_name=all_args['middle_name'],
             surname = all_args['surname'],
             prof = all_args['prof'],
-            image=all_args['img'].encode()
-            )
+            image=img
+        )
+
         new_doctor.set_hash_psw(all_args['password'])
         db_sess.add(new_doctor)
         db_sess.commit()
@@ -190,7 +187,7 @@ class ListDoctors(Resource):
         db_sess = db_session.create_session()
         doc = db_sess.query(Reg_Doctor).all()
         return jsonify({'doctors': [item.to_dict(
-            only=('id', 'name', 'middle_name', 'surname', 'prof')) for item in doc]})
+            only=('id', 'name', 'middle_name', 'surname', 'prof', 'image')) for item in doc]})
 
 
 admin_api.add_resource(ListDoctors, '/doctor_api/doctors')
