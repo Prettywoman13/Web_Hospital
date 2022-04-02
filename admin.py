@@ -10,7 +10,7 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from forms.news_form import NewsForm
 from forms.reg_doctor import RegistraionDoctorForm
 from flask import Blueprint
-admin = Blueprint('admin_api', __name__, template_folder='templates')
+admin = Blueprint('admin', __name__, template_folder='templates')
 admin_api = Api(admin)
 doctor_api_parser = reqparse.RequestParser()
 doctor_api_parser.add_argument('login', required=True)
@@ -73,7 +73,7 @@ def create_doctor():
                                            is_auth=current_user.is_authenticated,
                                            message='пароли не совпадают')
 
-                post(f'http://{HOST}:{PORT}/admin/create_doctor_api',
+                post(f'http://{HOST}:{PORT}/admin/doctor_api/1',
                      json={
                          'login': form.login.data,
                          'password': form.password.data,
@@ -81,13 +81,13 @@ def create_doctor():
                          'middle_name': form.middle_name.data,
                          'surname': form.surname.data,
                          'prof': form.prof.data})
+
             return render_template('admin_reg_doctor.html', form=form, is_auth=current_user.is_authenticated)
 
 
 class Patient(Resource):
 
     def get(self, id):
-        # abort_if_news_not_found(news_id)
         session = db_session.create_session()
         user = session.query(Reg_User).get(id)
         print(user.__dict__)
@@ -96,25 +96,40 @@ class Patient(Resource):
 
 
 class Doctor(Resource):
-    def get(self, id):
-        pass
+    def get(self, doctor_id):
+        db_sess = db_session.create_session()
+        doc = db_sess.query(Reg_Doctor).filter(Reg_Doctor.id == doctor_id).first()
+        if not doc:
+            abort(404, message=f"Doctor with id:{doctor_id} not found")
+        return jsonify(
+            {'doctor': {
+                'name': doc.login,
+                'middle_name': doc.middle_name,
+                'surname': doc.surname,
+                'prof': doc.prof
+                }
+            })
 
-    def post(self):
+    def post(self, doctor_id):
         all_args = doctor_api_parser.parse_args()
         db_sess = db_session.create_session()
-        print(all_args)
         new_doctor = Reg_Doctor(
-        login=all_args['login'],
-        name = all_args['name'],
-        middle_name = all_args['middle_name'],
-        surname = all_args['surname'],
-        prof = all_args['prof'])
+            login=all_args['login'],
+            name=all_args['name'],
+            middle_name=all_args['middle_name'],
+            surname = all_args['surname'],
+            prof = all_args['prof'])
         new_doctor.set_hash_psw(all_args['password'])
         db_sess.add(new_doctor)
         db_sess.commit()
         return jsonify({'success': 'OK'})
 
+    def delete(self, doctor_id):
+        db_sess = db_session.create_session()
+        doctor_to_delete = db_sess.query(Reg_Doctor).filter(Reg_Doctor.id == doctor_id).first()
+        db_sess.delete(doctor_to_delete)
+        db_sess.commit()
+        return jsonify({'success': 'OK'})
 
 
-admin_api.add_resource(Doctor, '/create_doctor_api')
-admin_api.add_resource(Patient, '/<id>')
+admin_api.add_resource(Doctor, '/doctor_api/<doctor_id>')

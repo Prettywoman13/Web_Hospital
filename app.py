@@ -81,7 +81,7 @@ def registration():
             name=form.name.data,
             surname=form.surname.data,
             patronymic=form.middle_name.data,
-            pnone_number=form.number_phone.data,
+            phone_number=form.number_phone.data,
             snils=form.snils.data,
             oms_series=form.series_oms.data,
             oms_number=form.number_oms.data

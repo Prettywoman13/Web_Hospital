@@ -17,7 +17,7 @@ class Reg_User(SqlAlchemyBase, UserMixin, SerializerMixin):
     name = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     surname = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     patronymic = sqlalchemy.Column(sqlalchemy.String, nullable=False)
-    pnone_number = sqlalchemy.Column(sqlalchemy.String, nullable=False)
+    phone_number = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     snils = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     oms_series = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     oms_number = sqlalchemy.Column(sqlalchemy.String, nullable=False)
@@ -32,7 +32,7 @@ class Reg_User(SqlAlchemyBase, UserMixin, SerializerMixin):
         return f"{self.surname} {self.name} {self.patronymic}"
 
     def get_phone(self):
-        return self.pnone_number
+        return self.phone_number
 
     def get_snils(self):
         return self.snils
