@@ -31,9 +31,7 @@ doctor_api_parser.add_argument('img')
 def create_news_page():
     if current_user.is_authenticated:
         if session['_user_id'] != admin_id:
-            return '''
-            ошибка доступа, обратитесь к системному администратору
-            '''
+            abort(401)
         else:
 
             form = NewsForm()
@@ -56,9 +54,7 @@ def create_news_page():
                                    is_auth=current_user.is_authenticated,
                                    form=form)
 
-    return '''
-    вы не зареганы
-    '''
+    return abort(401)
 
 
 @login_required
@@ -175,14 +171,12 @@ class Doctor(Resource):
         doctor_data.image = img
         db_sess.commit()
 
-
     def delete(self, doctor_id):
         db_sess = db_session.create_session()
         doctor_to_delete = db_sess.query(Reg_Doctor).filter(Reg_Doctor.id == doctor_id).first()
         db_sess.delete(doctor_to_delete)
         db_sess.commit()
         return jsonify({'success': 'OK'})
-
 
 
 class ListDoctors(Resource):
