@@ -1,7 +1,9 @@
 import base64
+
+import requests
 from flask import Flask, render_template, url_for, redirect, session, request, blueprints
-from werkzeug.security import generate_password_hash
 from admin import admin
+from data.doctor_model import Reg_Doctor
 from cfg import HOST, PORT
 from data import db_session
 from data.news import News
@@ -108,7 +110,12 @@ def index():
     for i in news:
         i.image = base64.b64encode(i.image).decode("utf-8")
 
-    return render_template("index.html", title="Главная страница", is_auth=current_user.is_authenticated, news=news)
+    doctors = requests.get(f'http://{HOST}:{PORT}/admin/doctor_api/doctors').json()
+    return render_template("index.html",
+                           title="Главная страница",
+                           is_auth=current_user.is_authenticated,
+                           news=news,
+                           doctors=doctors)
 
 
 @app.errorhandler(401)
@@ -116,9 +123,9 @@ def unlogin_user(e):
     return 'ты не авторизован'
 
 
-# @app.errorhandler(404)
-# def unlogin_user(e):
-#     return 'не та страница'
+@app.errorhandler(404)
+def unlogin_user(e):
+    return 'не та страница'
 
 
 if __name__ == '__main__':

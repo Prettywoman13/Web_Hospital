@@ -132,4 +132,14 @@ class Doctor(Resource):
         return jsonify({'success': 'OK'})
 
 
+class ListDoctors(Resource):
+    def get(self):
+        db_sess = db_session.create_session()
+        doc = db_sess.query(Reg_Doctor).all()
+        return jsonify({'doctors': [item.to_dict(
+            only=('id', 'name', 'middle_name', 'surname', 'prof')) for item in doc]})
+
+
+
+admin_api.add_resource(ListDoctors, '/doctor_api/doctors')
 admin_api.add_resource(Doctor, '/doctor_api/<doctor_id>')
