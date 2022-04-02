@@ -1,5 +1,5 @@
 from flask import Flask, render_template, url_for, redirect, session, request, jsonify
-from requests import post
+from requests import post, get, put
 from data.doctor_model import Reg_Doctor
 from cfg import HOST, admin_id, PORT
 from data.news import News
@@ -83,6 +83,40 @@ def create_doctor():
                          'prof': form.prof.data})
 
             return render_template('admin_reg_doctor.html', form=form, is_auth=current_user.is_authenticated)
+    else:
+        abort(401)
+
+
+@login_required
+@admin.route('/change_doctor/<int:doc_id>', methods=['GET', 'POST'])
+def change_doctor_data(doc_id):
+    if current_user.is_authenticated:
+        if session['_user_id'] != admin_id:
+            abort(401)
+        else:
+            doc_data = get(f'http://{HOST}:{PORT}/admin/doctor_api/{doc_id}')
+            if doc_data.status_code != 200:
+                abort(doc_data.status_code)
+            doc_data = doc_data.json()['doctor']
+            form = RegistraionDoctorForm(
+                login=doc_data['login'],
+                name=doc_data['name'],
+                surname=doc_data['surname'],
+                middle_name=doc_data['middle_name'],
+                prof=doc_data['prof'])
+            if form.validate_on_submit():
+                put(f'http://{HOST}:{PORT}/admin/doctor_api/{doc_id}',
+                    json={
+                        'login': form.login.data,
+                        'password': form.password.data,
+                        'name': form.name.data,
+                        'middle_name': form.middle_name.data,
+                        'surname': form.surname.data,
+                        'prof': form.prof.data})
+            return render_template('change_doctor.html', form=form, is_auth=current_user.is_authenticated)
+    else:
+        abort(401)
+
 
 
 class Patient(Resource):
@@ -103,7 +137,8 @@ class Doctor(Resource):
             abort(404, message=f"Doctor with id:{doctor_id} not found")
         return jsonify(
             {'doctor': {
-                'name': doc.login,
+                'login': doc.login,
+                'name': doc.name,
                 'middle_name': doc.middle_name,
                 'surname': doc.surname,
                 'prof': doc.prof
@@ -124,6 +159,16 @@ class Doctor(Resource):
         db_sess.commit()
         return jsonify({'success': 'OK'})
 
+    def put(self, doctor_id):
+        all_args = doctor_api_parser.parse_args()
+        db_sess = db_session.create_session()
+        doctor_data = db_sess.query(Reg_Doctor).filter(Reg_Doctor.id == doctor_id).first()
+        doctor_data.name = all_args['name']
+        doctor_data.surname = all_args['surname']
+        doctor_data.middle_name = all_args['middle_name']
+        doctor_data.prof = all_args['prof']
+        db_sess.commit()
+
     def delete(self, doctor_id):
         db_sess = db_session.create_session()
         doctor_to_delete = db_sess.query(Reg_Doctor).filter(Reg_Doctor.id == doctor_id).first()
@@ -132,13 +177,13 @@ class Doctor(Resource):
         return jsonify({'success': 'OK'})
 
 
+
 class ListDoctors(Resource):
     def get(self):
         db_sess = db_session.create_session()
         doc = db_sess.query(Reg_Doctor).all()
         return jsonify({'doctors': [item.to_dict(
             only=('id', 'name', 'middle_name', 'surname', 'prof')) for item in doc]})
-
 
 
 admin_api.add_resource(ListDoctors, '/doctor_api/doctors')
