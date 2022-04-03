@@ -1,15 +1,13 @@
 import base64
-
-from flask import Flask, render_template, url_for, redirect, session, request, jsonify
+from flask import render_template, url_for, redirect, session, request, jsonify
 from requests import post, get, put
+from forms.edit_doc_on_page import Change_Btns
 from data.doctor_model import Reg_Doctor
 from cfg import HOST, admin_id, PORT
 from data.news import News
 from flask_restful import reqparse, abort, Api, Resource
 from data import db_session
-from data.reg_users import Reg_User
-from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-
+from flask_login import login_required, current_user
 from forms.edit_doctor_validator import ChangeDoctorForm
 from forms.news_form import NewsForm
 from forms.reg_doctor import RegistraionDoctorForm
@@ -24,6 +22,25 @@ doctor_api_parser.add_argument('middle_name')
 doctor_api_parser.add_argument('surname')
 doctor_api_parser.add_argument('prof')
 doctor_api_parser.add_argument('img')
+
+
+@login_required
+@admin.route("/", methods=['GET', 'POST'])
+def admin_main_page():
+    if current_user.is_authenticated:
+        if session['_user_id'] != admin_id:
+            abort(401)
+        print(request.method)
+        if request.method == 'POST':
+            print('yes')
+            if "add_news" in request.form:
+                return redirect(url_for('admin.create_news_page'))
+            elif "get_all_doc" in request.form:
+                return redirect(url_for('admin.show_doctors'))
+            else:
+                pass  # unknown
+        return render_template('admin_index.html', is_auth=current_user.is_authenticated,)
+    abort(401)
 
 
 @login_required
@@ -58,37 +75,45 @@ def create_news_page():
 
 
 @login_required
+@admin.route('/all_doctors', methods=['GET', 'POST'])
+def show_doctors():
+    doctors = get(f'http://{HOST}:{PORT}/admin/doctor_api/doctors').json()['doctors']
+    form = Change_Btns()
+    if request.method == 'POST':
+        print(form.edit)
+
+    return render_template('show_doctors.html', is_auth=current_user.is_authenticated,
+                           doctors=doctors, form=form)
+
+
+@login_required
 @admin.route('/add_doctor', methods=['GET', 'POST'])
 def create_doctor():
     if current_user.is_authenticated:
         if session['_user_id'] != admin_id:
-            return '''
-            ошибка доступа, обратитесь к системному администратору
-            '''
-        else:
-            form = RegistraionDoctorForm()
-            if form.validate_on_submit():
-                if form.password.data != form.password_again.data:
-                    return render_template('admin_reg_doctor.html',
-                                           form=form,
-                                           is_auth=current_user.is_authenticated,
-                                           message='пароли не совпадают')
-                img = base64.b64encode(request.files["img1"].stream.read())
-                print(type(img))
-                post(f'http://{HOST}:{PORT}/admin/doctor_api/1',
-                     json={
-                         'login': form.login.data,
-                         'password': form.password.data,
-                         'name': form.name.data,
-                         'middle_name': form.middle_name.data,
-                         'surname': form.surname.data,
-                         'prof': form.prof.data,
-                         'img': str(img),
-                     })
+            abort(401)
+        form = RegistraionDoctorForm()
+        if form.validate_on_submit():
+            if form.password.data != form.password_again.data:
+                return render_template('admin_reg_doctor.html',
+                                       form=form,
+                                       is_auth=current_user.is_authenticated,
+                                       message='пароли доктора не совпадают')
+            img = base64.b64encode(request.files["img1"].stream.read())
+            post(f'http://{HOST}:{PORT}/admin/doctor_api/1',
+                 json={
+                     'login': form.login.data,
+                     'password': form.password.data,
+                     'name': form.name.data,
+                     'middle_name': form.middle_name.data,
+                     'surname': form.surname.data,
+                     'prof': form.prof.data,
+                     'img': str(img),
+                 })
 
-            return render_template('admin_reg_doctor.html', form=form, is_auth=current_user.is_authenticated)
-    else:
-        abort(401)
+        return render_template('admin_reg_doctor.html', form=form, is_auth=current_user.is_authenticated)
+
+    abort(401)
 
 
 @login_required
@@ -117,7 +142,6 @@ def change_doctor_data(doc_id):
                         'prof': form.prof.data,
                         'img': str(img)
                     })
-                print('all_correct')
             return render_template('change_doctor.html', form=form, is_auth=current_user.is_authenticated)
     else:
         abort(401)
@@ -137,20 +161,18 @@ class Doctor(Resource):
                 'middle_name': doc.middle_name,
                 'surname': doc.surname,
                 'prof': doc.prof
-                }
-            })
+            }})
 
     def post(self, doctor_id):
         all_args = doctor_api_parser.parse_args()
-        print(all_args)
         db_sess = db_session.create_session()
         img = bytes(all_args['img'], encoding='utf-8')[2:-1]
         new_doctor = Reg_Doctor(
             login=all_args['login'],
             name=all_args['name'],
             middle_name=all_args['middle_name'],
-            surname = all_args['surname'],
-            prof = all_args['prof'],
+            surname=all_args['surname'],
+            prof=all_args['prof'],
             image=img
         )
 
@@ -184,7 +206,7 @@ class ListDoctors(Resource):
         db_sess = db_session.create_session()
         doc = db_sess.query(Reg_Doctor).all()
         return jsonify({'doctors': [item.to_dict(
-            only=('id', 'name', 'middle_name', 'surname', 'prof', 'image')) for item in doc]})
+            only=('login','id', 'name', 'middle_name', 'surname', 'prof', 'image')) for item in doc]})
 
 
 admin_api.add_resource(ListDoctors, '/doctor_api/doctors')
