@@ -133,7 +133,7 @@ def unlogin_user(e):
 def unlogin_user(e):
     form = FormError()
     if form.validate_on_submit():
-        pass
+        return redirect(url_for('index'))
     return render_template("shablon_error.html", form=form, title="Ошбика 404", error_message="Кажется что-то пошло не так! Страница, которую вы запрашиваете, не существует. Возомжно она устарела, была удалена, или был введён неверный адрес в адресной строке.")
 
 

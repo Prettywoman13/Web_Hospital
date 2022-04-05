@@ -30,15 +30,12 @@ def admin_main_page():
     if current_user.is_authenticated:
         if session['_user_id'] != admin_id:
             abort(401)
-        print(request.method)
         if request.method == 'POST':
-            print('yes')
             if "add_news" in request.form:
                 return redirect(url_for('admin.create_news_page'))
             elif "get_all_doc" in request.form:
                 return redirect(url_for('admin.show_doctors'))
-            else:
-                pass  # unknown
+
         return render_template('admin_index.html', is_auth=current_user.is_authenticated,)
     abort(401)
 
@@ -153,7 +150,6 @@ class Doctor(Resource):
         doc = db_sess.query(Reg_Doctor).filter(Reg_Doctor.id == doctor_id).first()
         if not doc:
             abort(404, message=f"Doctor with id:{doctor_id} not found")
-
         return jsonify(
             {'doctor': {
                 'login': doc.login,
