@@ -12,6 +12,7 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from forms.login import LoginForm
 from forms.news_form import NewsForm
 from forms.registration import RegistraionForm
+from forms.form_error import FormError
 
 app = Flask(__name__)
 app.register_blueprint(admin, url_prefix='/admin')
@@ -121,12 +122,19 @@ def index():
 
 @app.errorhandler(401)
 def unlogin_user(e):
-    return 'ты не авторизован'
+    form = FormError()
+    if form.validate_on_submit():
+        pass
+    return render_template("shablon_error.html", form=form, title="Ошбика 401", error_message=
+    "У вас нет разрешения на просмотр этого каталога или страницы с использованием предоставленных вами учетных данных.")
 
 
 @app.errorhandler(404)
 def unlogin_user(e):
-    return 'не та страница'
+    form = FormError()
+    if form.validate_on_submit():
+        pass
+    return render_template("shablon_error.html", form=form, title="Ошбика 404", error_message="Кажется что-то пошло не так! Страница, которую вы запрашиваете, не существует. Возомжно она устарела, была удалена, или был введён неверный адрес в адресной строке.")
 
 
 if __name__ == '__main__':
