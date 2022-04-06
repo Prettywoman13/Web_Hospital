@@ -1,5 +1,5 @@
 import base64
-from flask import render_template, url_for, redirect, session, request, jsonify
+from flask import render_template, url_for, redirect, session, request, jsonify, flash
 from requests import post, get, put
 from forms.edit_doc_on_page import Change_Btns
 from data.doctor_model import Reg_Doctor
@@ -76,9 +76,6 @@ def create_news_page():
 def show_doctors():
     doctors = get(f'http://{HOST}:{PORT}/admin/doctor_api/doctors').json()['doctors']
     form = Change_Btns()
-    if request.method == 'POST':
-        print(form.edit)
-
     return render_template('show_doctors.html', is_auth=current_user.is_authenticated,
                            doctors=doctors, form=form)
 
@@ -107,6 +104,8 @@ def create_doctor():
                      'prof': form.prof.data,
                      'img': str(img),
                  })
+            flash('Доктор создан')
+            return redirect(url_for('admin.admin_main_page'))
 
         return render_template('admin_reg_doctor.html', form=form, is_auth=current_user.is_authenticated)
 
@@ -130,15 +129,27 @@ def change_doctor_data(doc_id):
                 middle_name=doc_data['middle_name'],
                 prof=doc_data['prof'])
             if form.validate_on_submit():
+
                 img = base64.b64encode(request.files["img1"].stream.read())
-                put(f'http://{HOST}:{PORT}/admin/doctor_api/{doc_id}',
-                    json={
-                        'name': form.name.data,
-                        'middle_name': form.middle_name.data,
-                        'surname': form.surname.data,
-                        'prof': form.prof.data,
-                        'img': str(img)
-                    })
+                if len(img) == 0:
+                    put(f'http://{HOST}:{PORT}/admin/doctor_api/{doc_id}',
+                          json={
+                              'name': form.name.data,
+                              'middle_name': form.middle_name.data,
+                              'surname': form.surname.data,
+                              'prof': form.prof.data,
+                          })
+                else:
+                    put(f'http://{HOST}:{PORT}/admin/doctor_api/{doc_id}',
+                        json={
+                            'name': form.name.data,
+                            'middle_name': form.middle_name.data,
+                            'surname': form.surname.data,
+                            'prof': form.prof.data,
+                            'img': str(img)
+                        })
+                flash('Данные изменены')
+                return redirect(url_for('admin.admin_main_page'))
             return render_template('change_doctor.html', form=form, is_auth=current_user.is_authenticated)
     else:
         abort(401)
@@ -185,9 +196,11 @@ class Doctor(Resource):
         doctor_data.surname = all_args['surname']
         doctor_data.middle_name = all_args['middle_name']
         doctor_data.prof = all_args['prof']
-        img = bytes(all_args['img'], encoding='utf-8')[2:-1]
-        doctor_data.image = img
+        if all_args['img']:
+            img = bytes(all_args['img'], encoding='utf-8')[2:-1]
+            doctor_data.image = img
         db_sess.commit()
+        return {'method': 'This is a PATCH request'}
 
     def delete(self, doctor_id):
         db_sess = db_session.create_session()

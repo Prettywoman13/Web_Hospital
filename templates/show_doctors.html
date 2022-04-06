@@ -22,7 +22,7 @@
 #doctors th {
   padding-top: 12px;
   padding-bottom: 12px;
-  text-align: left;
+  text-align: center;
   background-color: #467EE5;
   color: white;
 }
@@ -56,15 +56,12 @@
                                     <td>
                                         <form method="POST" action="">
                                             <button><a href="{{ url_for('admin.change_doctor_data',doc_id = doctor.id)}}">редактировать</a></button>
-<!--                                            тут еще удаление будет но оно не готово-->
+                                            <button><a href="{{ url_for('admin.change_doctor_data',doc_id = doctor.id)}}">Удалить</a></button>
                                         </form>
                                     </td>
 
                           </tr>
     {% endfor %}
 </table>
-
-
-
 
 {% endblock %}
