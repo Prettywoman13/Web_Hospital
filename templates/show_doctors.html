@@ -56,7 +56,8 @@
                                     <td>
                                         <form method="POST" action="">
                                             <button><a href="{{ url_for('admin.change_doctor_data',doc_id = doctor.id)}}">редактировать</a></button>
-                                            <button><a href="{{ url_for('admin.change_doctor_data',doc_id = doctor.id)}}">Удалить</a></button>
+                                            <br>
+                                            <button><a href="{{ url_for('admin.del_doctor',doc_id = doctor.id)}}">Удалить</a></button>
                                         </form>
                                     </td>
 

@@ -1,6 +1,6 @@
 import base64
 from flask import render_template, url_for, redirect, session, request, jsonify, flash
-from requests import post, get, put, patch
+from requests import post, get, put, patch, delete
 from forms.edit_doc_on_page import Change_Btns
 from data.doctor_model import Reg_Doctor
 from cfg import HOST, admin_id, PORT
@@ -83,6 +83,14 @@ def show_doctors():
     form = Change_Btns()
     return render_template('show_doctors.html', is_auth=current_user.is_authenticated,
                            doctors=doctors, form=form)
+
+
+@admin.route('/delete_doctor/<int:doc_id>', methods=['GET'])
+def del_doctor(doc_id):
+    print(doc_id)
+    delete(f'http://{HOST}:{PORT}/admin/doctor_api/{doc_id}')
+    flash('Доктор удален')
+    return redirect(url_for('admin.admin_main_page'))
 
 
 @login_required
@@ -212,6 +220,7 @@ class Doctor(Resource):
         return jsonify({'success': 'OK'})
 
     def delete(self, doctor_id):
+
         db_sess = db_session.create_session()
         doctor_to_delete = db_sess.query(Reg_Doctor).filter(Reg_Doctor.id == doctor_id).first()
         db_sess.delete(doctor_to_delete)
