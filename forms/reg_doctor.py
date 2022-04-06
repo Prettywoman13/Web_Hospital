@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 
-from wtforms import PasswordField, SubmitField, EmailField, StringField, IntegerField, TelField, FileField
+from wtforms import PasswordField, SubmitField, EmailField, StringField, FileField, BooleanField
 from wtforms.validators import DataRequired, Email, InputRequired, Length, ValidationError
 
 
@@ -14,3 +14,4 @@ class RegistraionDoctorForm(FlaskForm):
     img_picker = FileField('Изображение (Необязательно)')
     prof = StringField('Специальность врача', validators=[DataRequired()])
     submit = SubmitField('Зарегестрироваться')
+    is_active = BooleanField('Активировать врача')

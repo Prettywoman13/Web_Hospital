@@ -1,6 +1,6 @@
 import base64
 from flask import render_template, url_for, redirect, session, request, jsonify, flash
-from requests import post, get, put
+from requests import post, get, put, patch
 from forms.edit_doc_on_page import Change_Btns
 from data.doctor_model import Reg_Doctor
 from cfg import HOST, admin_id, PORT
@@ -14,6 +14,10 @@ from forms.reg_doctor import RegistraionDoctorForm
 from flask import Blueprint
 admin = Blueprint('admin', __name__, template_folder='templates')
 admin_api = Api(admin)
+doc_states = {
+    'True': True,
+    'False': False
+}
 doctor_api_parser = reqparse.RequestParser()
 doctor_api_parser.add_argument('login')
 doctor_api_parser.add_argument('password')
@@ -22,6 +26,7 @@ doctor_api_parser.add_argument('middle_name')
 doctor_api_parser.add_argument('surname')
 doctor_api_parser.add_argument('prof')
 doctor_api_parser.add_argument('img')
+doctor_api_parser.add_argument('is_active')
 
 
 @login_required
@@ -41,7 +46,7 @@ def admin_main_page():
 
 
 @login_required
-@admin.route("/create_news", methods=['GET', 'POST'])
+@admin.route("/add_news", methods=['GET', 'POST'])
 def create_news_page():
     if current_user.is_authenticated:
         if session['_user_id'] != admin_id:
@@ -72,7 +77,7 @@ def create_news_page():
 
 
 @login_required
-@admin.route('/all_doctors', methods=['GET', 'POST'])
+@admin.route('/list_doctors', methods=['GET', 'POST'])
 def show_doctors():
     doctors = get(f'http://{HOST}:{PORT}/admin/doctor_api/doctors').json()['doctors']
     form = Change_Btns()
@@ -103,6 +108,7 @@ def create_doctor():
                      'surname': form.surname.data,
                      'prof': form.prof.data,
                      'img': str(img),
+                     'is_active': bool(form.is_active.data)
                  })
             flash('Доктор создан')
             return redirect(url_for('admin.admin_main_page'))
@@ -113,7 +119,7 @@ def create_doctor():
 
 
 @login_required
-@admin.route('/change_doctor/<int:doc_id>', methods=['GET', 'POST'])
+@admin.route('/update_doctor/<int:doc_id>', methods=['GET', 'POST'])
 def change_doctor_data(doc_id):
     if current_user.is_authenticated:
         if session['_user_id'] != admin_id:
@@ -127,12 +133,13 @@ def change_doctor_data(doc_id):
                 name=doc_data['name'],
                 surname=doc_data['surname'],
                 middle_name=doc_data['middle_name'],
-                prof=doc_data['prof'])
+                prof=doc_data['prof'],
+                is_active=doc_data['is_active'])
             if form.validate_on_submit():
 
                 img = base64.b64encode(request.files["img1"].stream.read())
                 if len(img) == 0:
-                    put(f'http://{HOST}:{PORT}/admin/doctor_api/{doc_id}',
+                    patch(f'http://{HOST}:{PORT}/admin/doctor_api/{doc_id}',
                           json={
                               'name': form.name.data,
                               'middle_name': form.middle_name.data,
@@ -140,7 +147,7 @@ def change_doctor_data(doc_id):
                               'prof': form.prof.data,
                           })
                 else:
-                    put(f'http://{HOST}:{PORT}/admin/doctor_api/{doc_id}',
+                    patch(f'http://{HOST}:{PORT}/admin/doctor_api/{doc_id}',
                         json={
                             'name': form.name.data,
                             'middle_name': form.middle_name.data,
@@ -167,7 +174,8 @@ class Doctor(Resource):
                 'name': doc.name,
                 'middle_name': doc.middle_name,
                 'surname': doc.surname,
-                'prof': doc.prof
+                'prof': doc.prof,
+                'is_active': doc.is_active
             }})
 
     def post(self, doctor_id):
@@ -180,7 +188,8 @@ class Doctor(Resource):
             middle_name=all_args['middle_name'],
             surname=all_args['surname'],
             prof=all_args['prof'],
-            image=img
+            image=img,
+            is_active=doc_states[all_args['is_active']]
         )
 
         new_doctor.set_hash_psw(all_args['password'])
@@ -188,7 +197,7 @@ class Doctor(Resource):
         db_sess.commit()
         return jsonify({'success': 'OK'})
 
-    def put(self, doctor_id):
+    def patch(self, doctor_id):
         all_args = doctor_api_parser.parse_args()
         db_sess = db_session.create_session()
         doctor_data = db_sess.query(Reg_Doctor).filter(Reg_Doctor.id == doctor_id).first()
@@ -200,7 +209,7 @@ class Doctor(Resource):
             img = bytes(all_args['img'], encoding='utf-8')[2:-1]
             doctor_data.image = img
         db_sess.commit()
-        return {'method': 'This is a PATCH request'}
+        return jsonify({'success': 'OK'})
 
     def delete(self, doctor_id):
         db_sess = db_session.create_session()
