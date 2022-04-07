@@ -11,4 +11,4 @@ class ChangeDoctorForm(FlaskForm):
     img_picker = FileField('Изображение (Необязательно)')
     prof = StringField('Специальность врача', validators=[DataRequired()])
     is_active = BooleanField('Активировать врача')
-    submit = SubmitField('Зарегестрироваться')
+    submit = SubmitField('Изменить данные')

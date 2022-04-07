@@ -7,11 +7,12 @@
 #doctors {
   font-family: Arial, Helvetica, sans-serif;
   border-collapse: collapse;
+
   width: 80%;
 }
 
-#doctorss td, #customers th {
-  border: 1px solid #ddd;
+#doctors td, #customers th {
+  border: 2px solid #467EE5;
   padding: 8px;
 }
 
@@ -36,6 +37,7 @@
         <th>Отчество</th>
         <th>Должность</th>
         <th>Логин для авторизации</th>
+        <th>Активен ли доктор</th>
         <th>Взаимодействие</th>
     </tr>
 {% for doctor in doctors %}
@@ -53,6 +55,7 @@
                                   <td>{{doctor.middle_name}}</td>
                                   <td>{{doctor.prof}}</td>
                                   <td>{{doctor.login}}</td>
+                                    <td>{{doctor.is_active }}</td>
                                     <td>
                                         <form method="POST" action="">
                                             <button><a href="{{ url_for('admin.change_doctor_data',doc_id = doctor.id)}}">редактировать</a></button>

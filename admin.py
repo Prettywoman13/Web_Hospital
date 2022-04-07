@@ -153,6 +153,7 @@ def change_doctor_data(doc_id):
                               'middle_name': form.middle_name.data,
                               'surname': form.surname.data,
                               'prof': form.prof.data,
+                              'is_active': str(form.is_active.data)
                           })
                 else:
                     patch(f'http://{HOST}:{PORT}/admin/doctor_api/{doc_id}',
@@ -216,6 +217,8 @@ class Doctor(Resource):
         if all_args['img']:
             img = bytes(all_args['img'], encoding='utf-8')[2:-1]
             doctor_data.image = img
+        print(all_args['is_active'])
+        doctor_data.is_active = doc_states[all_args['is_active']]
         db_sess.commit()
         return jsonify({'success': 'OK'})
 
@@ -233,7 +236,7 @@ class ListDoctors(Resource):
         db_sess = db_session.create_session()
         doc = db_sess.query(Reg_Doctor).all()
         return jsonify({'doctors': [item.to_dict(
-            only=('login','id', 'name', 'middle_name', 'surname', 'prof', 'image')) for item in doc]})
+            only=('login','id', 'name', 'middle_name', 'surname', 'prof', 'image', 'is_active')) for item in doc]})
 
 
 admin_api.add_resource(ListDoctors, '/doctor_api/doctors')

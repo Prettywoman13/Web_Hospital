@@ -8,6 +8,7 @@ from .db_session import SqlAlchemyBase
 
 class Reg_Doctor(SqlAlchemyBase, UserMixin, SerializerMixin):
     __tablename__ = 'reg_doctor'
+    _info = []
 
     id = sqlalchemy.Column(sqlalchemy.Integer,
                            primary_key=True, autoincrement=True, index=True)
@@ -20,8 +21,11 @@ class Reg_Doctor(SqlAlchemyBase, UserMixin, SerializerMixin):
     image = sqlalchemy.Column(sqlalchemy.BLOB, nullable=True, default=None)
     is_active = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
 
+
     def set_hash_psw(self, password):
         self.password = generate_password_hash(password)
 
     def check_password(self, password):
-        return check_password_hash(self.hashed_password, password)
+        return check_password_hash(self.password, password)
+
+

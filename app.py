@@ -2,6 +2,8 @@ import base64
 
 import requests
 from flask import Flask, render_template, url_for, redirect, session, request, blueprints
+
+from doctor import doctor
 from admin import admin
 from data.doctor_model import Reg_Doctor
 from cfg import HOST, PORT
@@ -10,12 +12,12 @@ from data.news import News
 from data.reg_users import Reg_User
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from forms.login import LoginForm
-from forms.news_form import NewsForm
 from forms.registration import RegistraionForm
 from forms.form_error import FormError
 
 app = Flask(__name__)
 app.register_blueprint(admin, url_prefix='/admin')
+app.register_blueprint(doctor, url_prefix='/doctor')
 login_manager = LoginManager()
 login_manager.init_app(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
