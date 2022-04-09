@@ -3,7 +3,6 @@ import base64
 import requests
 from flask import Flask, render_template, url_for, redirect, session, request, blueprints
 
-from doctor import doctor
 from admin import admin
 from data.doctor_model import Reg_Doctor
 from cfg import HOST, PORT
@@ -17,7 +16,6 @@ from forms.form_error import FormError
 
 app = Flask(__name__)
 app.register_blueprint(admin, url_prefix='/admin')
-app.register_blueprint(doctor, url_prefix='/doctor')
 login_manager = LoginManager()
 login_manager.init_app(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -114,7 +112,6 @@ def index():
         i.image = base64.b64encode(i.image).decode("utf-8")
 
     doctors = requests.get(f'http://{HOST}:{PORT}/admin/doctor_api/doctors').json()
-    print(doctors)
     return render_template("index.html",
                            title="Главная страница",
                            is_auth=current_user.is_authenticated,

@@ -31,7 +31,7 @@ doctor_api_parser.add_argument('is_active')
 
 @login_required
 @admin.route("/", methods=['GET', 'POST'])
-def admin_main_page():
+def admin_index_page():
     if current_user.is_authenticated:
         if session['_user_id'] != admin_id:
             abort(401)
@@ -87,10 +87,9 @@ def show_doctors():
 
 @admin.route('/delete_doctor/<int:doc_id>', methods=['GET'])
 def del_doctor(doc_id):
-    print(doc_id)
     delete(f'http://{HOST}:{PORT}/admin/doctor_api/{doc_id}')
     flash('Доктор удален')
-    return redirect(url_for('admin.admin_main_page'))
+    return redirect(url_for('admin.admin_index_page'))
 
 
 @login_required
@@ -119,7 +118,7 @@ def create_doctor():
                      'is_active': bool(form.is_active.data)
                  })
             flash('Доктор создан')
-            return redirect(url_for('admin.admin_main_page'))
+            return redirect(url_for('admin.admin_index_page'))
 
         return render_template('admin_reg_doctor.html', form=form, is_auth=current_user.is_authenticated)
 
@@ -165,7 +164,7 @@ def change_doctor_data(doc_id):
                             'img': str(img)
                         })
                 flash('Данные изменены')
-                return redirect(url_for('admin.admin_main_page'))
+                return redirect(url_for('admin.admin_index_page'))
             return render_template('change_doctor.html', form=form, is_auth=current_user.is_authenticated)
     else:
         abort(401)
@@ -217,7 +216,6 @@ class Doctor(Resource):
         if all_args['img']:
             img = bytes(all_args['img'], encoding='utf-8')[2:-1]
             doctor_data.image = img
-        print(all_args['is_active'])
         doctor_data.is_active = doc_states[all_args['is_active']]
         db_sess.commit()
         return jsonify({'success': 'OK'})
