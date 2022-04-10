@@ -2,70 +2,47 @@
 
 
 {% block content %}
+<table id="doctors" class="table table-hover" style="width: 90%;" align="center">
+    <thead class="table-dark">
+        <tr>
+            <th class="align-middle" scope="col">ID</th>
+            <th class="align-middle" scope="col">Аватарка</th>
+            <th class="align-middle" scope="col">Имя</th>
+            <th class="align-middle" scope="col">Фамилия</th>
+            <th class="align-middle" scope="col">Отчество</th>
+            <th class="align-middle" scope="col">Должность</th>
+            <th class="align-middle" scope="col">Логин для авторизации</th>
+            <th class="align-middle" scope="col">Активен ли доктор</th>
+            <th class="align-middle" scope="col">Взаимодействие</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for doctor in doctors %}
+            <tr>
+                <th class="align-middle" scope="row">{{ doctor.id }} </th>
+                <td class="align-middle">
+                    <img src="data:image/png;base64,{{doctor.image}}" class="rounded float-start"
+                         style="width: 150px; height:150px">
+                </td>
 
-<style>
-#doctors {
-  font-family: Arial, Helvetica, sans-serif;
-  border-collapse: collapse;
-
-  width: 80%;
-}
-
-#doctors td, #customers th {
-  border: 2px solid #467EE5;
-  padding: 8px;
-}
-
-#doctors tr:nth-child(even){background-color: #f2f2f2;}
-
-#doctors tr:hover {background-color: #ddd;}
-
-#doctors th {
-  padding-top: 12px;
-  padding-bottom: 12px;
-  text-align: center;
-  background-color: #467EE5;
-  color: white;
-}
-</style>
-<table id="doctors" align="center">
-    <tr>
-        <th>ID</th>
-        <th>Аватарка</th>
-        <th>Имя</th>
-        <th>Фамилия</th>
-        <th>Отчество</th>
-        <th>Должность</th>
-        <th>Логин для авторизации</th>
-        <th>Активен ли доктор</th>
-        <th>Взаимодействие</th>
-    </tr>
-{% for doctor in doctors %}
-
-                          <tr>
-                                  <td>{{doctor.id}} </td>
-                                  <td>
-                                      <div class="card" style="width: 8rem;">
-                                        <img src="data:image/png;base64,{{doctor.image}}">
-                                      </div>
-                                  </td>
-
-                                  <td>{{doctor.surname}} </td>
-                                  <td>{{doctor.name}}</td>
-                                  <td>{{doctor.middle_name}}</td>
-                                  <td>{{doctor.prof}}</td>
-                                  <td>{{doctor.login}}</td>
-                                    <td>{{doctor.is_active }}</td>
-                                    <td>
-                                        <form method="POST" action="">
-                                            <button><a href="{{ url_for('admin.change_doctor_data',doc_id = doctor.id)}}">редактировать</a></button>
-                                            <br>
-                                            <button><a href="{{ url_for('admin.del_doctor',doc_id = doctor.id)}}">Удалить</a></button>
-                                        </form>
-                                    </td>
-
-                          </tr>
-    {% endfor %}
+                <td class="align-middle">{{ doctor.surname}} </td>
+                <td class="align-middle">{{ doctor.name}}</td>
+                <td class="align-middle">{{ doctor.middle_name}}</td>
+                <td class="align-middle">{{ doctor.prof}}</td>
+                <td class="align-middle">{{ doctor.login}}</td>
+                <td class="align-middle">{{ doctor.is_active }}</td>
+                <td class="align-middle">
+                    <form method="POST" action="">
+                        <a role="button" class="btn btn-outline-primary btn-sm"
+                           href="{{ url_for('admin.change_doctor_data',doc_id = doctor.id)}}">Редактировать</a>
+                        <br>
+                        <br>
+                        <a role="button" class="btn btn-outline-primary btn-sm"
+                           href="{{ url_for('admin.del_doctor',doc_id = doctor.id)}}">Удалить</a>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
 </table>
-
 {% endblock %}

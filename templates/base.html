@@ -23,6 +23,11 @@
         <div class="collapse navbar-collapse justify-content-end align-center" id="main-nav">
           <ul class="navbar-nav">
             {% if is_auth %}
+              {% if is_admin %}
+                <li class="nav-item">
+                  <a class="nav-link" href="#">Админ панель</a>
+                </li>
+              {% endif %}
               <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('profile') }}">Мой профиль</a>
               </li>

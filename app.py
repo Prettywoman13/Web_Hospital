@@ -6,7 +6,7 @@ from flask import Flask, render_template, url_for, redirect, session, request, b
 from doctor import doctor
 from admin import admin
 from data.doctor_model import Reg_Doctor
-from cfg import HOST, PORT
+from cfg import HOST, PORT, admin_id
 from data import db_session
 from data.news import News
 from data.reg_users import Reg_User
@@ -103,7 +103,9 @@ def registration():
 @login_required
 def profile():
     user = current_user
-    return render_template('profile.html', user=user, is_auth=current_user.is_authenticated)
+
+    return render_template('profile.html', user=user, is_auth=current_user.is_authenticated,
+                           is_admin=session['_user_id'] == admin_id)
 
 
 @app.route("/")
@@ -113,13 +115,19 @@ def index():
     for i in news:
         i.image = base64.b64encode(i.image).decode("utf-8")
 
+    try:
+        is_admin = session['_user_id'] == admin_id
+    except KeyError:
+        is_admin = False
+
     doctors = requests.get(f'http://{HOST}:{PORT}/admin/doctor_api/doctors').json()
     print(doctors)
     return render_template("index.html",
                            title="Главная страница",
                            is_auth=current_user.is_authenticated,
                            news=news,
-                           doctors=doctors)
+                           doctors=doctors,
+                           is_admin=is_admin)
 
 
 @app.errorhandler(401)

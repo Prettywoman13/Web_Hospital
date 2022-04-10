@@ -35,11 +35,11 @@ def admin_main_page():
     if current_user.is_authenticated:
         if session['_user_id'] != admin_id:
             abort(401)
-        if request.method == 'POST':
-            if "add_news" in request.form:
-                return redirect(url_for('admin.create_news_page'))
-            elif "get_all_doc" in request.form:
-                return redirect(url_for('admin.show_doctors'))
+        # if request.method == 'POST':
+        #     if "add_news" in request.form:
+        #         return redirect(url_for('admin.create_news_page'))
+        #     elif "get_all_doc" in request.form:
+        #         return redirect(url_for('admin.show_doctors'))
 
         return render_template('admin_index.html', is_auth=current_user.is_authenticated,)
     abort(401)

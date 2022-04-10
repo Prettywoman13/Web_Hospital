@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% block content %}
-<p>странца админа</p>
 {% with messages = get_flashed_messages() %}
   {% if messages %}
     <ul class=flashes>
@@ -11,8 +10,16 @@
     </ul>
   {% endif %}
 {% endwith %}
+
 <form method="POST">
-    <input type="submit" name="add_news" value="добавить новость">
-    <input type="submit" name="get_all_doc" value="открыть всех врачей">
+    <div class="d-grid gap-3 col-6 mx-auto">
+        <a role="button" class="btn btn-primary"
+           href="{{ url_for('admin.create_news_page') }}">Добавить новость
+        </a>
+        <a role="button" class="btn btn-primary"
+           href="{{ url_for('admin.show_doctors') }}">Открыть всех врачей
+        </a>
+    </div>
 </form>
+
 {% endblock %}
