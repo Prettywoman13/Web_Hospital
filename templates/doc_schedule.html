@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+<p>Добавить расписание врача</p>
+<select>
+    {% for opt in doctors_data %}
+      <option>{{ opt }}</option>
+    {% endfor %}
+</select>
+{% endblock %}

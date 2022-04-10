@@ -1,6 +1,8 @@
 import base64
+
+import requests
 from flask import render_template, url_for, redirect, session, request, jsonify, flash
-from requests import post, get, put, patch, delete
+from requests import post, get, patch, delete
 from forms.edit_doc_on_page import Change_Btns
 from data.doctor_model import Reg_Doctor
 from cfg import HOST, admin_id, PORT
@@ -31,7 +33,7 @@ doctor_api_parser.add_argument('is_active')
 
 @login_required
 @admin.route("/", methods=['GET', 'POST'])
-def admin_main_page():
+def admin_index_page():
     if current_user.is_authenticated:
         if session['_user_id'] != admin_id:
             abort(401)
@@ -79,7 +81,7 @@ def create_news_page():
 @login_required
 @admin.route('/list_doctors', methods=['GET', 'POST'])
 def show_doctors():
-    doctors = get(f'http://{HOST}:{PORT}/admin/doctor_api/doctors').json()['doctors']
+    doctors = requests.get(f'http://{HOST}:{PORT}/admin/doctor_api/doctors').json()['doctors']
     form = Change_Btns()
     return render_template('show_doctors.html', is_auth=current_user.is_authenticated,
                            doctors=doctors, form=form)
@@ -87,10 +89,9 @@ def show_doctors():
 
 @admin.route('/delete_doctor/<int:doc_id>', methods=['GET'])
 def del_doctor(doc_id):
-    print(doc_id)
     delete(f'http://{HOST}:{PORT}/admin/doctor_api/{doc_id}')
     flash('Доктор удален')
-    return redirect(url_for('admin.admin_main_page'))
+    return redirect(url_for('admin.admin_index_page'))
 
 
 @login_required
@@ -119,7 +120,7 @@ def create_doctor():
                      'is_active': bool(form.is_active.data)
                  })
             flash('Доктор создан')
-            return redirect(url_for('admin.admin_main_page'))
+            return redirect(url_for('admin.admin_index_page'))
 
         return render_template('admin_reg_doctor.html', form=form, is_auth=current_user.is_authenticated)
 
@@ -157,18 +158,28 @@ def change_doctor_data(doc_id):
                           })
                 else:
                     patch(f'http://{HOST}:{PORT}/admin/doctor_api/{doc_id}',
-                        json={
+                          json={
                             'name': form.name.data,
                             'middle_name': form.middle_name.data,
                             'surname': form.surname.data,
                             'prof': form.prof.data,
                             'img': str(img)
-                        })
+                          })
                 flash('Данные изменены')
-                return redirect(url_for('admin.admin_main_page'))
+                return redirect(url_for('admin.admin_index_page'))
             return render_template('change_doctor.html', form=form, is_auth=current_user.is_authenticated)
     else:
         abort(401)
+
+
+@admin.route('/add_doctor_schedule/')
+def add_schedule():
+    doctor_list = []
+    db_sess = db_session.create_session()
+    doctors_query = db_sess.query(Reg_Doctor).with_entities(Reg_Doctor.name, Reg_Doctor.surname, Reg_Doctor.prof).filter(Reg_Doctor.is_active==True)
+    for doctor in doctors_query:
+        doctor_list.append(f'{doctor.name} {doctor.surname} {doctor.prof}')
+    return render_template('doc_schedule.html', doctors_data=doctor_list)
 
 
 class Doctor(Resource):
@@ -217,13 +228,11 @@ class Doctor(Resource):
         if all_args['img']:
             img = bytes(all_args['img'], encoding='utf-8')[2:-1]
             doctor_data.image = img
-        print(all_args['is_active'])
         doctor_data.is_active = doc_states[all_args['is_active']]
         db_sess.commit()
         return jsonify({'success': 'OK'})
 
     def delete(self, doctor_id):
-
         db_sess = db_session.create_session()
         doctor_to_delete = db_sess.query(Reg_Doctor).filter(Reg_Doctor.id == doctor_id).first()
         db_sess.delete(doctor_to_delete)
@@ -232,11 +241,17 @@ class Doctor(Resource):
 
 
 class ListDoctors(Resource):
-    def get(self):
+    def get(self,):
         db_sess = db_session.create_session()
-        doc = db_sess.query(Reg_Doctor).all()
+        args = request.args
+        kwargs_for_view = {}
+        for key, value in args.items():
+            kwargs_for_view[key] = value
+            if key == 'is_active':
+                kwargs_for_view[key] = doc_states[value]
+        doc = db_sess.query(Reg_Doctor).filter_by(**kwargs_for_view)
         return jsonify({'doctors': [item.to_dict(
-            only=('login','id', 'name', 'middle_name', 'surname', 'prof', 'image', 'is_active')) for item in doc]})
+            only=('login', 'id', 'name', 'middle_name', 'surname', 'prof', 'image', 'is_active')) for item in doc]})
 
 
 admin_api.add_resource(ListDoctors, '/doctor_api/doctors')
