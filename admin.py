@@ -172,6 +172,16 @@ def change_doctor_data(doc_id):
         abort(401)
 
 
+@admin.route('/add_doctor_schedule/')
+def add_schedule():
+    doctor_list = []
+    db_sess = db_session.create_session()
+    doctors_query = db_sess.query(Reg_Doctor).with_entities(Reg_Doctor.name, Reg_Doctor.surname, Reg_Doctor.prof).filter(Reg_Doctor.is_active==True)
+    for doctor in doctors_query:
+        doctor_list.append(f'{doctor.name} {doctor.surname} {doctor.prof}')
+    return render_template('doc_schedule.html', doctors_data=doctor_list)
+
+
 class Doctor(Resource):
     def get(self, doctor_id):
         db_sess = db_session.create_session()

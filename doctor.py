@@ -5,7 +5,7 @@ from flask import Flask, render_template, url_for, redirect, session, request, b
 
 from admin import admin
 from data.doctor_model import Reg_Doctor
-from cfg import HOST, PORT
+from cfg import HOST, DOCTOR_PORT, DOCTOR_HOST
 from data import db_session
 from data.news import News
 from data.reg_users import Reg_User
@@ -16,31 +16,32 @@ from forms.login import LoginForm
 from forms.registration import RegistraionForm
 from forms.form_error import FormError
 
-app = Flask(__name__)
-login_manager = LoginManager()
-login_manager.init_app(app)
-app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
+app_doc = Flask('doctor')
+login_manager1 = LoginManager()
+REMEMBER_COOKIE_SECURE = False
+login_manager1.init_app(app_doc)
+app_doc.config['SECRET_KEY'] = 'yandexlycereferf3345345um_secret_key'
 
 
 def main():
     db_session.global_init("db/users.db")
-    app.run(debug=True, port=PORT, host=HOST)
+    app_doc.run(debug=True, port=DOCTOR_PORT, host=DOCTOR_HOST)
 
 
-@login_manager.user_loader
+@login_manager1.user_loader
 def load_user(id):
     db_sess = db_session.create_session()
     return db_sess.query(Reg_Doctor).get(id)
 
 
-@app.route('/logout')
+@app_doc.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect("/")
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app_doc.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for("index"))
@@ -65,11 +66,11 @@ def login():
 #     return render_template('profile.html', user=user, is_auth=current_user.is_authenticated)
 
 
-@app.route("/")
+@app_doc.route("/")
 def index():
     return f'Привет доктор {current_user.login}'
 
-@app.errorhandler(401)
+@app_doc.errorhandler(401)
 def unlogin_user(e):
     form = FormError()
     if form.validate_on_submit():
@@ -78,7 +79,7 @@ def unlogin_user(e):
     "У вас нет разрешения на просмотр этого каталога или страницы с использованием предоставленных вами учетных данных.")
 
 
-@app.errorhandler(404)
+@app_doc.errorhandler(404)
 def unlogin_user(e):
     form = FormError()
     if form.validate_on_submit():
