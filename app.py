@@ -106,6 +106,7 @@ def profile():
 
 @app.route("/")
 def index():
+    print(current_user)
     db_sess = db_session.create_session()
     news = db_sess.query(News).all()[-1:-6:-1]
     for i in news:

@@ -2,32 +2,39 @@ import base64
 
 import requests
 from flask import Flask, render_template, url_for, redirect, session, request, blueprints
-from forms.doctor_login_form import DoctorLoginForm
+
+from admin import admin
 from data.doctor_model import Reg_Doctor
-from cfg import HOST, DOCTOR_PORT
+from cfg import HOST, PORT
 from data import db_session
+from data.news import News
+from data.reg_users import Reg_User
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+
+from forms.doctor_login_form import DoctorLoginForm
 from forms.login import LoginForm
+from forms.registration import RegistraionForm
 from forms.form_error import FormError
 
 app = Flask(__name__)
 login_manager = LoginManager()
 login_manager.init_app(app)
-app.config['SECRET_KEY'] = 'ysdf2342k3j4kl234jandexlyceum_secret_key'
+app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 
 
 def main():
     db_session.global_init("db/users.db")
-    app.run(debug=True, port=DOCTOR_PORT, host=HOST)
+    app.run(debug=True, port=PORT, host=HOST)
 
 
 @login_manager.user_loader
-def load_user(doc_id):
+def load_user(id):
     db_sess = db_session.create_session()
-    return db_sess.query(Reg_Doctor).get(doc_id)
+    return db_sess.query(Reg_Doctor).get(id)
 
 
 @app.route('/logout')
+@login_required
 def logout():
     logout_user()
     return redirect("/")
@@ -37,7 +44,6 @@ def logout():
 def login():
     if current_user.is_authenticated:
         return redirect(url_for("index"))
-
     form = DoctorLoginForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
@@ -46,8 +52,7 @@ def login():
         if user is None:
             return render_template('login_doc.html', message="Такой учетной записи не существует.", form=form)
         if user.check_password(form.password.data):
-            login_user(user, remember=True)
-            print(current_user)
+            login_user(user)
             return redirect(url_for("index"))
         return render_template('login_doc.html', message="Неправильный логин или пароль", form=form)
     return render_template('login_doc.html', title='Авторизация', form=form)
@@ -62,9 +67,7 @@ def login():
 
 @app.route("/")
 def index():
-    print(current_user)
-    return f'приветствую, вас, доктор! {current_user}'
-
+    return f'Привет доктор {current_user.login}'
 
 @app.errorhandler(401)
 def unlogin_user(e):
