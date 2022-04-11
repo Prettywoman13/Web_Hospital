@@ -3,6 +3,8 @@ import base64
 import requests
 from flask import render_template, url_for, redirect, session, request, jsonify, flash
 from requests import post, get, patch, delete
+
+from forms.add_schedule_form import DoctorScheduleForm
 from forms.edit_doc_on_page import Change_Btns
 from data.doctor_model import Reg_Doctor
 from cfg import HOST, admin_id, PORT
@@ -172,14 +174,19 @@ def change_doctor_data(doc_id):
         abort(401)
 
 
-@admin.route('/add_doctor_schedule/')
+@admin.route('/add_doctor_schedule/', methods=['POST', 'GET'])
 def add_schedule():
     doctor_list = []
     db_sess = db_session.create_session()
     doctors_query = db_sess.query(Reg_Doctor).with_entities(Reg_Doctor.name, Reg_Doctor.surname, Reg_Doctor.prof).filter(Reg_Doctor.is_active==True)
     for doctor in doctors_query:
         doctor_list.append(f'{doctor.name} {doctor.surname} {doctor.prof}')
-    return render_template('doc_schedule.html', doctors_data=doctor_list)
+    form = DoctorScheduleForm()
+    if form.validate_on_submit():
+        for i in form:
+            print(i)
+        return 'ok'
+    return render_template('doc_schedule.html', doctors_data=doctor_list, form=form)
 
 
 class Doctor(Resource):

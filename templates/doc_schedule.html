@@ -8,4 +8,18 @@
       <option>{{ opt }}</option>
     {% endfor %}
 </select>
+<form method="post" action="">
+     {{ form.hidden_tag() }}
+    {{ form.worktime_from.label}}
+    {{ form.worktime_from}}
+    {{ form.worktime_until.label}}
+    {{ form.worktime_until}}
+    {{ form.lunch_from.label}}
+    {{ form.lunch_from}}
+    {{ form.lunch_until.label}}
+    {{ form.lunch_until}}
+    {{form.timedelta.label}}
+    {{form.timedelta}}
+    {{form.submit}}
+</form>
 {% endblock %}

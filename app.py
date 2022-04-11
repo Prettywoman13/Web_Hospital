@@ -133,7 +133,7 @@ def index():
 def unlogin_user(e):
     form = FormError()
     if form.validate_on_submit():
-        pass
+        return redirect(url_for('index'))
     return render_template("shablon_error.html", form=form, title="Ошбика 401", error_message=
     "У вас нет разрешения на просмотр этого каталога или страницы с использованием предоставленных вами учетных данных.")
 
