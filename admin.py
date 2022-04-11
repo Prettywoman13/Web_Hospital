@@ -3,7 +3,7 @@ import base64
 import requests
 from flask import render_template, url_for, redirect, session, request, jsonify, flash
 from requests import post, get, patch, delete
-
+from get_schedule_doc_list import calc_time_list
 from forms.add_schedule_form import DoctorScheduleForm
 from forms.edit_doc_on_page import Change_Btns
 from data.doctor_model import Reg_Doctor
@@ -183,8 +183,10 @@ def add_schedule():
         doctor_list.append(f'{doctor.name} {doctor.surname} {doctor.prof}')
     form = DoctorScheduleForm()
     if form.validate_on_submit():
-        for i in form:
-            print(i)
+
+        a = calc_time_list(str(form.worktime_from.data), str(form.worktime_until.data), str(form.lunch_from.data), str(form.lunch_until.data), int(form.timedelta.data))
+        print(a)
+
         return 'ok'
     return render_template('doc_schedule.html', doctors_data=doctor_list, form=form)
 
