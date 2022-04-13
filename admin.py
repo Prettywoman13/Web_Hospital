@@ -1,12 +1,14 @@
 import base64
+import datetime
+from datetime import date
 
 import requests
 from flask import render_template, url_for, redirect, session, request, jsonify, flash
 from requests import post, get, patch, delete
-from get_schedule_doc_list import calc_time_list
+from get_schedule_doc_list import get_schedule_list
 from forms.add_schedule_form import DoctorScheduleForm
 from forms.edit_doc_on_page import Change_Btns
-from data.doctor_model import Reg_Doctor
+from data.doctor_model import Reg_Doctor, Schedule
 from cfg import HOST, admin_id, PORT
 from data.news import News
 from flask_restful import reqparse, abort, Api, Resource
@@ -178,14 +180,27 @@ def change_doctor_data(doc_id):
 def add_schedule():
     doctor_list = []
     db_sess = db_session.create_session()
-    doctors_query = db_sess.query(Reg_Doctor).with_entities(Reg_Doctor.name, Reg_Doctor.surname, Reg_Doctor.prof).filter(Reg_Doctor.is_active==True)
+    doctors_query = db_sess.query(Reg_Doctor).with_entities(Reg_Doctor.id, Reg_Doctor.name, Reg_Doctor.surname,
+                                                            Reg_Doctor.prof).filter(Reg_Doctor.is_active==True)
     for doctor in doctors_query:
-        doctor_list.append(f'{doctor.name} {doctor.surname} {doctor.prof}')
+        doctor_list.append(f'айди:{doctor.id} ФИ:{doctor.name} {doctor.surname} Профессия :{doctor.prof}')
     form = DoctorScheduleForm()
     if form.validate_on_submit():
+        tickets = get_schedule_list(
+            [],
+            form.worktime_from.data,
+            form.worktime_until.data,
+            int(form.timedelta.data)
+        )
+        print(type(date.today()))
+        new_schedule = Schedule(
+            doc_id=request.form.get('doc_choice').split(' ')[0][-1],
+            date=datetime.datetime.now,
+            tickets=tickets
 
-        a = calc_time_list(str(form.worktime_from.data), str(form.worktime_until.data), str(form.lunch_from.data), str(form.lunch_until.data), int(form.timedelta.data))
-        print(a)
+        )
+        db_sess.add(new_schedule)
+        db_sess.commit()
 
         return 'ok'
     return render_template('doc_schedule.html', doctors_data=doctor_list, form=form)

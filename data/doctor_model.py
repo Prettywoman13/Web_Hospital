@@ -1,6 +1,6 @@
-
 import sqlalchemy
 from flask_login import UserMixin
+from sqlalchemy import orm
 from sqlalchemy_serializer import SerializerMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from .db_session import SqlAlchemyBase
@@ -19,10 +19,23 @@ class Reg_Doctor(SqlAlchemyBase, UserMixin, SerializerMixin):
     prof = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     image = sqlalchemy.Column(sqlalchemy.BLOB, nullable=True, default=None)
     is_active = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
+    doc_schedule = orm.relation("Schedule", back_populates='doctor')
 
     def set_hash_psw(self, password):
         self.hashed_password = generate_password_hash(password)
 
     def check_password(self, password):
         return check_password_hash(self.hashed_password, password)
+
+
+class Schedule(SqlAlchemyBase):
+    __tablename__ = 'add_schedule'
+    id = sqlalchemy.Column(sqlalchemy.Integer,
+                           primary_key=True, autoincrement=True)
+    doc_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("reg_doctor.id"), nullable=False)
+    doctor = orm.relation('Reg_Doctor')
+    date = sqlalchemy.Column(sqlalchemy.DateTime, nullable=False)
+    tickets = sqlalchemy.Column(sqlalchemy.String, nullable=False)
+
+
 
