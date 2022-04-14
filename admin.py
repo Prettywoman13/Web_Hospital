@@ -186,22 +186,25 @@ def add_schedule():
         doctor_list.append(f'айди:{doctor.id} ФИ:{doctor.name} {doctor.surname} Профессия :{doctor.prof}')
     form = DoctorScheduleForm()
     if form.validate_on_submit():
+        if datetime.datetime.strptime(request.form['date'], '%Y-%m-%d') < datetime.datetime.today():
+            return render_template('doc_schedule.html', doctors_data=doctor_list, form=form, message='Дата не корректа, вы не можете добавить талоны в прошлое' )
+
         tickets = get_schedule_list(
             [],
             form.worktime_from.data,
             form.worktime_until.data,
+            form.lunch_from.data,
+            form.lunch_until.data,
             int(form.timedelta.data)
         )
-        print(type(date.today()))
-        new_schedule = Schedule(
-            doc_id=request.form.get('doc_choice').split(' ')[0][-1],
-            date=datetime.datetime.now,
-            tickets=tickets
-
-        )
-        db_sess.add(new_schedule)
+        for ticket in tickets:
+            ticket = datetime.datetime.strptime(ticket, '%H:%M').time().replace(second=0, microsecond=0)
+            new_schedule = Schedule(
+                doc_id=request.form.get('doc_choice').split(' ')[0][-1],
+                date=datetime.datetime.strptime(request.form['date'], '%Y-%m-%d'),
+                tickets=ticket)
+            db_sess.add(new_schedule)
         db_sess.commit()
-
         return 'ok'
     return render_template('doc_schedule.html', doctors_data=doctor_list, form=form)
 

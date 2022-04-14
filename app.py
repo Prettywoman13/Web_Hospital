@@ -134,8 +134,10 @@ def unlogin_user(e):
     form = FormError()
     if form.validate_on_submit():
         return redirect(url_for('index'))
-    return render_template("shablon_error.html", form=form, title="Ошбика 401", error_message=
-    "У вас нет разрешения на просмотр этого каталога или страницы с использованием предоставленных вами учетных данных.")
+    return render_template("shablon_error.html",
+                           form=form, title="Ошбика 401",
+                           error_message="У вас нет разрешения на просмотр этого каталога или страницы с "
+                                         "использованием предоставленных вами учетных данных.")
 
 
 @app.errorhandler(404)
@@ -143,7 +145,10 @@ def unlogin_user(e):
     form = FormError()
     if form.validate_on_submit():
         return redirect(url_for('index'))
-    return render_template("shablon_error.html", form=form, title="Ошбика 404", error_message="Кажется что-то пошло не так! Страница, которую вы запрашиваете, не существует. Возомжно она устарела, была удалена, или был введён неверный адрес в адресной строке.")
+    return render_template("shablon_error.html", form=form, title="Ошбика 404",
+                           error_message="Кажется что-то пошло не так! Страница, которую вы ищите, не существует."
+                                         "Возмoжно она устарела, была удалена, "
+                                         "или был введён неверный адрес в адресной строке.")
 
 
 if __name__ == '__main__':

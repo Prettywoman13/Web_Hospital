@@ -34,8 +34,8 @@ class Schedule(SqlAlchemyBase):
                            primary_key=True, autoincrement=True)
     doc_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("reg_doctor.id"), nullable=False)
     doctor = orm.relation('Reg_Doctor')
-    date = sqlalchemy.Column(sqlalchemy.DateTime, nullable=False)
-    tickets = sqlalchemy.Column(sqlalchemy.String, nullable=False)
+    date = sqlalchemy.Column(sqlalchemy.Date, nullable=False)
+    tickets = sqlalchemy.Column(sqlalchemy.TIME, nullable=False)
 
 
 

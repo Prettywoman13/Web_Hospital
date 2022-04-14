@@ -4,13 +4,16 @@
 {% block content %}
 <p>Добавить расписание врача</p>
 <form method="post" action="">
+     <div class="col-md-6">
+                            {{ message }}
+     </div>
 <select name="doc_choice">
     {% for opt in doctors_data %}
       <option>{{ opt }}</option>
     {% endfor %}
 </select>
-
      {{ form.hidden_tag() }}
+    <input type="date"  name="date">
     {{ form.worktime_from.label}}
     {{ form.worktime_from}}
     {{ form.worktime_until.label}}
