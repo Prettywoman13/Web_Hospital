@@ -36,6 +36,20 @@ class Schedule(SqlAlchemyBase):
     doctor = orm.relation('Reg_Doctor')
     date = sqlalchemy.Column(sqlalchemy.Date, nullable=False)
     tickets = sqlalchemy.Column(sqlalchemy.TIME, nullable=False)
+    state = sqlalchemy.Column(sqlalchemy.Text, nullable=False)
+    sch = orm.relation("ScheduleForUser", back_populates='user_ticket')
+
+
+class ScheduleForUser(SqlAlchemyBase):
+    __tablename__ = 'schedule_for_user'
+    __table_args__ = {'extend_existing': True}
+    id = sqlalchemy.Column(sqlalchemy.Integer,
+                           primary_key=True, autoincrement=True)
+    schedule_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("add_schedule.id"), nullable=False)
+    user_ticket = orm.relation('Schedule')
+    user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("reg_users.id"), nullable=False)
+
+
 
 
 

@@ -93,8 +93,9 @@ def show_doctors():
 
 @admin.route('/delete_doctor/<int:doc_id>', methods=['GET'])
 def del_doctor(doc_id):
-    delete(f'http://{HOST}:{PORT}/admin/doctor_api/{doc_id}')
-    flash('Доктор удален')
+    res = delete(f'http://{HOST}:{PORT}/admin/doctor_api/{doc_id}')
+    print(res.json())
+    flash(res.json()['status'])
     return redirect(url_for('admin.admin_index_page'))
 
 
@@ -197,16 +198,22 @@ def add_schedule():
             form.lunch_until.data,
             int(form.timedelta.data)
         )
+        if len(tickets) == 0:
+            return render_template('doc_schedule.html', doctors_data=doctor_list, form=form,
+                                   is_auth=current_user.is_authenticated, message='Неправильные значения в расписании')
         for ticket in tickets:
             ticket = datetime.datetime.strptime(ticket, '%H:%M').time().replace(second=0, microsecond=0)
             new_schedule = Schedule(
                 doc_id=request.form.get('doc_choice').split(' ')[0][-1],
                 date=datetime.datetime.strptime(request.form['date'], '%Y-%m-%d'),
-                tickets=ticket)
+                tickets=ticket,
+                state='active')
             db_sess.add(new_schedule)
         db_sess.commit()
-        return 'ok'
-    return render_template('doc_schedule.html', doctors_data=doctor_list, form=form)
+        return render_template('doc_schedule.html', doctors_data=doctor_list, form=form,
+                               is_auth=current_user.is_authenticated, message='успешно')
+
+    return render_template('doc_schedule.html', doctors_data=doctor_list, form=form, is_auth=current_user.is_authenticated)
 
 
 class Doctor(Resource):
@@ -260,11 +267,15 @@ class Doctor(Resource):
         return jsonify({'success': 'OK'})
 
     def delete(self, doctor_id):
-        db_sess = db_session.create_session()
-        doctor_to_delete = db_sess.query(Reg_Doctor).filter(Reg_Doctor.id == doctor_id).first()
-        db_sess.delete(doctor_to_delete)
-        db_sess.commit()
-        return jsonify({'success': 'OK'})
+        try:
+            db_sess = db_session.create_session()
+            doctor_to_delete = db_sess.query(Reg_Doctor).filter(Reg_Doctor.id == doctor_id).first()
+            db_sess.delete(doctor_to_delete)
+            db_sess.commit()
+            return jsonify({'status': 'OK, доктор удален'})
+
+        except:
+            return jsonify({'status': 'нелья удалить дока, у него есть активные талоны.'})
 
 
 class ListDoctors(Resource):
