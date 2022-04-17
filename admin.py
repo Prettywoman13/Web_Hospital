@@ -184,7 +184,7 @@ def add_schedule():
     doctors_query = db_sess.query(Reg_Doctor).with_entities(Reg_Doctor.id, Reg_Doctor.name, Reg_Doctor.surname,
                                                             Reg_Doctor.prof).filter(Reg_Doctor.is_active==True)
     for doctor in doctors_query:
-        doctor_list.append(f'айди:{doctor.id} ФИ:{doctor.name} {doctor.surname} Профессия :{doctor.prof}')
+        doctor_list.append(f'{doctor.name} {doctor.surname} - {doctor.prof}')
     form = DoctorScheduleForm()
     if form.validate_on_submit():
         if datetime.datetime.strptime(request.form['date'], '%Y-%m-%d') < datetime.datetime.today():

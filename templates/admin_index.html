@@ -12,12 +12,21 @@
 {% endwith %}
 
 <form method="POST">
-    <div class="d-grid gap-3 col-6 mx-auto">
+    <div class="d-grid gap-3 col-6 mx-auto" style="margin-top:10%">
         <a role="button" class="btn btn-primary"
            href="{{ url_for('admin.create_news_page') }}">Добавить новость
         </a>
+
         <a role="button" class="btn btn-primary"
            href="{{ url_for('admin.show_doctors') }}">Открыть всех врачей
+        </a>
+
+        <a role="button" class="btn btn-primary"
+           href="{{ url_for('admin.add_schedule') }}">Добавить расписание
+        </a>
+
+        <a role="button" class="btn btn-primary"
+           href="{{ url_for('admin.create_doctor') }}">Добавить работника
         </a>
     </div>
 </form>

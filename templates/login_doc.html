@@ -1,17 +1,28 @@
-<link href="static/CSS/style.css" rel="stylesheet">
-{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="static/CSS/style.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://formden.com/static/cdn/bootstrap-iso.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker3.css"/>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <title>{{ title }}</title>
+</head>
+<body>
     <div class="container">
-        <div class="box-field">
+        <div class="box-field" style="margin-top: 12%">
             <div class="row justify-content-center">
                 <div class="col-md-6">
-                    <h3>Название сайта</h3>
+                    <h3>Поликлиника</h3>
                 </div>
             </div>
             <form method="POST" action="">
                 {{ form.hidden_tag() }}
                 <div class="row justify-content-center">
                     <div class="col-md-6">
-                        {{ form.login(class="form-control", placeholder="Логин") }}
+                        {{ form.login(class="form-control", type="text", placeholder="Логин") }}
                     </div>
                 </div>
 
@@ -21,11 +32,6 @@
                         {{ form.password(class="form-control", type="password", placeholder="Пароль") }}
                     </div>
                 </div>
-                <div class="row justify-content-center">
-                        <div class="col-md-6">
-                            {{ message }}
-                        </div>
-                </div>
                 <div class="row justify-content-left">
                     <div class="col-md">
                         <br>
@@ -33,8 +39,15 @@
                     </div>
                 </div>
 
+                <div class="row justify-content-center">
+                        <div class="col-md-6">
+                            {{ message }}
+                        </div>
+                </div>
+
             </form>
 
         </div>
     </div>
-{% endblock %}
+</body>
+</html>
