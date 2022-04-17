@@ -3,29 +3,61 @@
 
 {% block content %}
 
+<div class="d-flex justify-content-center">
+    <form method="post" action="">
+        <div class="col-12">
+            <p>{{ message }}</p>
+            <hr>
+         </div>
 
-<p>Добавить расписание врача</p>
-<form method="post" action="">
-     <div class="col-md-6">
-                            {{ message }}
-     </div>
-<select name="doc_choice">
-    {% for opt in doctors_data %}
-      <option>{{ opt }}</option>
-    {% endfor %}
-</select>
-     {{ form.hidden_tag() }}
-    <input type="date"  name="date">
-    {{ form.worktime_from.label}}
-    {{ form.worktime_from}}
-    {{ form.worktime_until.label}}
-    {{ form.worktime_until}}
-    {{ form.lunch_from.label}}
-    {{ form.lunch_from}}
-    {{ form.lunch_until.label}}
-    {{ form.lunch_until}}
-    {{form.timedelta.label}}
-    {{form.timedelta}}
-    {{form.submit}}
-</form>
+        <div class="col-12" style="margin-bottom: 5%">
+            <select class="form-select" aria-label="Default select example" name="doc_choice" >
+                {% for opt in doctors_data %}
+                  <option>{{ opt }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {{ form.hidden_tag() }}
+        <div class="col-12" style="margin-bottom: 5%">
+            <input type="date" class="form-control" name="date"/>
+        </div>
+
+        <div class="col-12" style="margin-bottom: 5%">
+            <div class="form-control">
+                {{ form.worktime_from.label}}
+                {{ form.worktime_from}}
+            </div>
+        </div>
+
+        <div class="col-12" style="margin-bottom: 5%">
+            <div class="form-control">
+                {{ form.worktime_until.label}}
+                {{ form.worktime_until}}
+            </div>
+        </div>
+
+        <div class="col-12" style="margin-bottom: 5%">
+            <div class="form-control">
+                {{ form.lunch_from.label}}
+                {{ form.lunch_from}}
+            </div>
+        </div>
+
+        <div class="col-12" style="margin-bottom: 5%">
+            <div class="form-control">
+                {{ form.lunch_until.label}}
+                {{ form.lunch_until}}
+            </div>
+        </div>
+
+        <div class="col-12" style="margin-bottom: 5%">
+            <div class="form-control">
+                {{form.timedelta.label}}
+                {{form.timedelta}}
+            </div>
+        </div>
+
+        <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+    </form>
+</div>
 {% endblock %}

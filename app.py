@@ -148,7 +148,7 @@ def make_an_appointment():
     except KeyError:
         is_admin = False
     return render_template("appointment_list.html",
-                           title="Главная страница",
+                           title="Запись к врачу",
                            is_auth=current_user.is_authenticated,
                            is_admin=is_admin, profs=profs)
 
