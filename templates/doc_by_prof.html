@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<table>
+
+{% for doctor in doctors %}
+            <tr>
+                <td >
+                    <img src="data:image/png;base64,{{doctor.image}}" class="rounded float-start"
+                         style="width: 150px; height:150px">
+                </td>
+
+                <td class="align-middle">{{ doctor.surname}} </td>
+                <td class="align-middle">{{ doctor.name}}</td>
+                <td class="align-middle">{{ doctor.middle_name}}</td>
+                <td class="align-middle">{{ doctor.prof}}</td>
+
+                <td><a role="button" class="btn btn-outline-primary btn-sm" href="{{ url_for('get_ticket',doc_id = doctor.id)}}">записаться</a></td>
+
+            </tr>
+        {% endfor %}
+</table>
+{% endblock %}
