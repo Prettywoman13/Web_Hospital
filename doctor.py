@@ -70,6 +70,7 @@ def login():
 def index():
     return f'Привет доктор {current_user.login}'
 
+
 @app_doc.errorhandler(401)
 def unlogin_user(e):
     form = FormError()
@@ -84,7 +85,8 @@ def unlogin_user(e):
     form = FormError()
     if form.validate_on_submit():
         return redirect(url_for('index'))
-    return render_template("shablon_error.html", form=form, title="Ошбика 404", error_message="Кажется что-то пошло не так! Страница, которую вы запрашиваете, не существует. Возомжно она устарела, была удалена, или был введён неверный адрес в адресной строке.")
+    return render_template("shablon_error.html", form=form, title="Ошбика 404",
+                           error_message="Кажется что-то пошло не так! Страница, которую вы запрашиваете, не существует. Возомжно она устарела, была удалена, или был введён неверный адрес в адресной строке.")
 
 
 if __name__ == '__main__':
