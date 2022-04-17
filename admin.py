@@ -188,7 +188,7 @@ def add_schedule():
     form = DoctorScheduleForm()
     if form.validate_on_submit():
         if datetime.datetime.strptime(request.form['date'], '%Y-%m-%d') < datetime.datetime.today():
-            return render_template('doc_schedule.html', doctors_data=doctor_list, form=form, message='Дата не корректа, вы не можете добавить талоны в прошлое' )
+            return render_template('doc_schedule.html', doctors_data=doctor_list, form=form, message='Дата не корректа, вы не можете добавить талоны в прошлое', is_auth=current_user.is_authenticated )
 
         tickets = get_schedule_list(
             [],

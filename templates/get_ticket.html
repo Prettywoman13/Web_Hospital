@@ -1,20 +1,25 @@
 {% extends "base.html" %}
+
 {% block content %}
-<table>
+<div class="table-responsive">
     {% for date in tickets.items() %}
-    <tr>
-
-        <td>{{date[0] }}</td>
-        <tr>
-        {% for time in date[-1] %}
-
-        <td class="align-middle">{{time['time']}}</td>
-
-    <td><a role="button" class="btn btn-outline-primary btn-sm" href="{{ url_for('get_ticket_submit',ticket_id =time['id']   )}}">записаться</a></td>
-        {% endfor %}
-    </tr>
-</tr>
-
+        <table class="table table-hover" style="width: 90%;" align="center">
+            <thead class="table-dark">
+                <tr>
+                    <th class="align-middle" scope="col">Дата: {{ date[0] }}</th>
+                    <th class="align-middle" scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for time in date[-1] %}
+                    <tr>
+                        <td class="align-middle">{{time['time']}}</td>
+                        <td><a role="button" class="btn btn-outline-primary btn-sm"
+                           href="{{ url_for('get_ticket_submit',ticket_id =time['id'])}}">Записаться</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     {% endfor %}
-</table>
+</div>
 {% endblock %}

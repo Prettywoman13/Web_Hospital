@@ -2,47 +2,49 @@
 
 
 {% block content %}
-<table id="doctors" class="table table-hover" style="width: 90%;" align="center">
-    <thead class="table-dark">
-        <tr>
-            <th class="align-middle" scope="col">ID</th>
-            <th class="align-middle" scope="col">Аватарка</th>
-            <th class="align-middle" scope="col">Имя</th>
-            <th class="align-middle" scope="col">Фамилия</th>
-            <th class="align-middle" scope="col">Отчество</th>
-            <th class="align-middle" scope="col">Должность</th>
-            <th class="align-middle" scope="col">Логин для авторизации</th>
-            <th class="align-middle" scope="col">Активен ли доктор</th>
-            <th class="align-middle" scope="col">Взаимодействие</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for doctor in doctors %}
+<div class="table-responsive">
+    <table id="doctors" class="table table-hover" style="width: 90%;" align="center">
+        <thead class="table-dark">
             <tr>
-                <th class="align-middle" scope="row">{{ doctor.id }} </th>
-                <td class="align-middle">
-                    <img src="data:image/png;base64,{{doctor.image}}" class="rounded float-start"
-                         style="width: 150px; height:150px">
-                </td>
-
-                <td class="align-middle">{{ doctor.surname}} </td>
-                <td class="align-middle">{{ doctor.name}}</td>
-                <td class="align-middle">{{ doctor.middle_name}}</td>
-                <td class="align-middle">{{ doctor.prof}}</td>
-                <td class="align-middle">{{ doctor.login}}</td>
-                <td class="align-middle">{{ doctor.is_active }}</td>
-                <td class="align-middle">
-                    <form method="POST" action="">
-                        <a role="button" class="btn btn-outline-primary btn-sm"
-                           href="{{ url_for('admin.change_doctor_data',doc_id = doctor.id)}}">Редактировать</a>
-                        <br>
-                        <br>
-                        <a role="button" class="btn btn-outline-primary btn-sm"
-                           href="{{ url_for('admin.del_doctor',doc_id = doctor.id)}}">Удалить</a>
-                    </form>
-                </td>
+                <th class="align-middle" scope="col">ID</th>
+                <th class="align-middle" scope="col">Аватарка</th>
+                <th class="align-middle" scope="col">Имя</th>
+                <th class="align-middle" scope="col">Фамилия</th>
+                <th class="align-middle" scope="col">Отчество</th>
+                <th class="align-middle" scope="col">Должность</th>
+                <th class="align-middle" scope="col">Логин для авторизации</th>
+                <th class="align-middle" scope="col">Активен ли доктор</th>
+                <th class="align-middle" scope="col">Взаимодействие</th>
             </tr>
-        {% endfor %}
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            {% for doctor in doctors %}
+                <tr>
+                    <th class="align-middle" scope="row">{{ doctor.id }} </th>
+                    <td class="align-middle">
+                        <img src="data:image/png;base64,{{doctor.image}}" class="rounded float-start"
+                             style="width: 150px; height:150px">
+                    </td>
+
+                    <td class="align-middle">{{ doctor.surname}} </td>
+                    <td class="align-middle">{{ doctor.name}}</td>
+                    <td class="align-middle">{{ doctor.middle_name}}</td>
+                    <td class="align-middle">{{ doctor.prof}}</td>
+                    <td class="align-middle">{{ doctor.login}}</td>
+                    <td class="align-middle">{{ doctor.is_active }}</td>
+                    <td class="align-middle">
+                        <form method="POST" action="">
+                            <a role="button" class="btn btn-outline-primary btn-sm"
+                               href="{{ url_for('admin.change_doctor_data',doc_id = doctor.id)}}">Редактировать</a>
+                            <br>
+                            <br>
+                            <a role="button" class="btn btn-outline-primary btn-sm"
+                               href="{{ url_for('admin.del_doctor',doc_id = doctor.id)}}">Удалить</a>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}
