@@ -1,21 +1,40 @@
 {% extends "base.html" %}
+
 {% block content %}
-<table>
-{% for doctor in doctors %}
+<div class="table-responsive">
+    <table class="table table-hover" style="width: 90%;" align="center">
+        <thead class="table-dark">
             <tr>
-                <td >
-                    <img src="data:image/png;base64,{{doctor.image}}" class="rounded float-start"
-                         style="width: 150px; height:150px">
-                </td>
-
-                <td class="align-middle">{{ doctor.surname}} </td>
-                <td class="align-middle">{{ doctor.name}}</td>
-                <td class="align-middle">{{ doctor.middle_name}}</td>
-                <td class="align-middle">{{ doctor.prof}}</td>
-
-                <td><a role="button" class="btn btn-outline-primary btn-sm" href="{{ url_for('get_ticket',doc_id = doctor.id)}}">записаться</a></td>
-
+                <th class="align-middle" scope="col"></th>
+                <th class="align-middle" scope="col">Фамилия</th>
+                <th class="align-middle" scope="col">Имя</th>
+                <th class="align-middle" scope="col">Отчество</th>
+                <th class="align-middle" scope="col">Профессия</th>
+                <th class="align-middle" scope="col"></th>
             </tr>
-        {% endfor %}
-</table>
+        </thead>
+        <tbody>
+                {% for doctor in doctors %}
+                <tr>
+                    <td class="align-middle">
+                            <img src="data:image/png;base64,{{doctor.image}}" class="rounded float-start"
+                                 style="width: 150px; height:150px">
+                    </td>
+
+                    <td class="align-middle">{{ doctor.surname}} </td>
+                    <td class="align-middle">{{ doctor.name}}</td>
+                    <td class="align-middle">{{ doctor.middle_name}}</td>
+                    <td class="align-middle">{{ doctor.prof}}</td>
+
+                    <td class="align-middle">
+                            <form method="POST" action="">
+                                <a role="button" class="btn btn-outline-primary btn-sm"
+                                   href="{{ url_for('get_ticket',doc_id = doctor.id)}}">Записаться</a>
+                            </form>
+                        </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}
