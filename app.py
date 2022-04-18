@@ -3,6 +3,8 @@ import datetime
 
 import requests
 from flask import Flask, render_template, url_for, redirect, session, request, blueprints, flash
+from sqlalchemy.orm.exc import UnmappedInstanceError
+
 from admin import admin
 from data.doctor_model import Reg_Doctor, Schedule, ScheduleForUser
 from cfg import HOST, PORT, admin_id
@@ -113,6 +115,7 @@ def profile():
             if i.id in user_tickets and i.date >= datetime.datetime.today().date():
                 doc = sess.query(Reg_Doctor).filter(Reg_Doctor.id == i.doc_id).first()
                 schedule_info[tickt_num] = {
+                    'id': i.id,
                     'date': i.date,
                     'time': i.tickets,
                     'doc_fio': f"{doc.surname} {doc.name} {doc.middle_name}",
@@ -209,6 +212,22 @@ def get_ticket_submit(ticket_id):
     sess.commit()
     flash('Вы записаны')
     return redirect(url_for('profile'))
+
+
+@app.route('/cancel_ticket/<int:ticket_id>')
+@login_required
+def cancel_ticket(ticket_id):
+    with db_session.create_session() as sess:
+        try:
+            query = sess.query(Schedule).filter(Schedule.id == ticket_id).first()
+            query.state = 'active'
+            query2 = sess.query(ScheduleForUser).filter(ScheduleForUser.schedule_id == ticket_id).first()
+            sess.delete(query2)
+            sess.commit()
+        except UnmappedInstanceError:
+            pass
+
+    return '123'
 
 
 @app.errorhandler(401)

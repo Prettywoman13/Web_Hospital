@@ -47,6 +47,8 @@
                     <h6>Время: {{i.time}}</h6>
                     <h6>ФИО Врача: {{i.doc_fio}}</h6>
                     <h6>Профессия: {{i.doc_prof}}</h6>
+                    <a role="button" class="btn btn-outline-primary btn-sm"
+                                   href="{{ url_for('cancel_ticket',ticket_id = i.id)}}">Записаться</a>
                 </div>
             </div>
         </div>
