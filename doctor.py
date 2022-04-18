@@ -1,10 +1,11 @@
 import base64
+from time import strftime
 
 import requests
 from flask import Flask, render_template, url_for, redirect, session, request, blueprints
 
 from admin import admin
-from data.doctor_model import Reg_Doctor
+from data.doctor_model import Reg_Doctor, Schedule, ScheduleForUser
 from cfg import HOST, DOCTOR_PORT, DOCTOR_HOST
 from data import db_session
 from data.news import News
@@ -59,16 +60,47 @@ def login():
     return render_template('login_doc.html', title='Авторизация', form=form)
 
 
-# @app.route("/profile", methods=['POST', 'GET'])
-# @login_required
-# def profile():
-#     user = current_user
-#     return render_template('profile.html', user=user, is_auth=current_user.is_authenticated)
-
-
+@login_required
 @app_doc.route("/")
 def index():
-    return f'Привет доктор {current_user.login}'
+    info_to_load = {}
+    if current_user.is_anonymous:
+        return redirect(url_for('login'))
+    with db_session.create_session() as session:
+        all_ticket = session.query(Schedule).filter(Schedule.doc_id == current_user.id).all()
+        for info in all_ticket:
+            if info.state == 'disable':
+                user_id = session.query(ScheduleForUser).filter(ScheduleForUser.schedule_id == info.id).first().user_id
+                print(user_id)
+                client_info = session.query(Reg_User).filter(Reg_User.id == user_id).first()
+                print(info.date)
+                try:
+                    info_to_load[info.date.strftime("%m/%d/%Y")].append(
+                        {
+                            'name': client_info.name,
+                            'patronymic': client_info.patronymic,
+                            'snils': client_info.snils,
+                            'oms_number': client_info.oms_number,
+                            'surname': client_info.surname,
+                            'email': client_info.email,
+                            'phone_number': client_info.phone_number,
+                            'oms_series': client_info.oms_series})
+
+                except KeyError:
+                   info_to_load[strftime(info.date.strftime("%%m/%d/%Y"))] = []
+                   info_to_load[strftime(info.date.strftime("%m/%d/%Y"))].append(
+                       {
+                           'name': client_info.name,
+                           'patronymic': client_info.patronymic,
+                           'snils': client_info.snils,
+                           'oms_number': client_info.oms_number,
+                           'surname': client_info.surname,
+                           'email': client_info.email,
+                           'phone_number': client_info.phone_number,
+                           'oms_series': client_info.oms_series})
+
+
+    return info_to_load
 
 
 @app_doc.errorhandler(401)
