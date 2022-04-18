@@ -106,6 +106,7 @@ def profile():
     # некрасаивый кусок кода, сюда лучше не смотреть )
     with db_session.create_session() as sess:
         user_tickets = sess.query(ScheduleForUser).filter(ScheduleForUser.user_id == user.id).all()
+        print(user_tickets)
         user_tickets = [x.schedule_id for x in user_tickets]
         all_tickets = sess.query(Schedule).all()
         for tickt_num, i in enumerate(all_tickets):
@@ -146,7 +147,8 @@ def index():
                            is_admin=is_admin)
 
 
-@app.route('/appointment')
+@app.route('/appointment', methods=['POST', 'GET'])
+@login_required
 def make_an_appointment():
     profs = []
     db_sess = db_session.create_session()
@@ -167,15 +169,17 @@ def make_an_appointment():
 
 
 @app.route('/doc_with_prof/<doc_prof>')
+@login_required
 def doc_with_prof(doc_prof):
     doctors = requests.get(f'http://{HOST}:{PORT}/admin/doctor_api/doctors', params={'prof': doc_prof}).json()['doctors']
     return render_template('doc_by_prof.html', is_auth=current_user.is_authenticated, doctors=doctors)
 
 
 @app.route('/get_ticket/<int:doc_id>', methods=['POST', 'GET'])
+@login_required
 def get_ticket(doc_id):
     sess = db_session.create_session()
-    tickets = sess.query(Schedule).filter(Schedule.doc_id == doc_id, Schedule.state == 'active').all()
+    tickets = sess.query(Schedule).filter(Schedule.doc_id == doc_id, Schedule.state == 'active', Schedule.date >= datetime.datetime.today().date()).all()
     info_for_user = {}
     for i in tickets:
         try:
@@ -190,9 +194,9 @@ def get_ticket(doc_id):
     return render_template('get_ticket.html', is_auth=current_user.is_authenticated, tickets=info_for_user)
 
 
-@app.route('/get_ticket_submit/<int:ticket_id>')
+@app.route('/get_ticket_submit/<int:ticket_id>', methods=['POST', 'GET'])
+@login_required
 def get_ticket_submit(ticket_id):
-    print('123')
     sess = db_session.create_session()
     selected_ticket = ScheduleForUser(
         schedule_id=ticket_id,
@@ -201,11 +205,8 @@ def get_ticket_submit(ticket_id):
 
     sess.add(selected_ticket)
     ticket_to_change = sess.query(Schedule).filter(Schedule.id == ticket_id).first()
-    print(ticket_to_change)
     ticket_to_change.state = 'disable'
     sess.commit()
-    ticket_to_change = sess.query(Schedule).filter(Schedule.id == ticket_id).first()
-    print(ticket_to_change.state)
     flash('Вы записаны')
     return redirect(url_for('profile'))
 

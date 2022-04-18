@@ -25,7 +25,12 @@
     </div>
 
 <br>
-
+<div class="d-grid gap-3 col-4 mx-auto">
+    {% if is_auth %}
+        <a role="button" class="btn btn-primary" href="{{ url_for('make_an_appointment') }}">Записаться!
+         </a>
+    {% endif %}
+</div>
 <div class="row justify-content-start" style="margin-left: 4%">
     <div class="col-12">
         <h4>Новости</h4>

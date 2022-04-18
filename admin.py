@@ -8,7 +8,7 @@ from requests import post, get, patch, delete
 from get_schedule_doc_list import get_schedule_list
 from forms.add_schedule_form import DoctorScheduleForm
 from forms.edit_doc_on_page import Change_Btns
-from data.doctor_model import Reg_Doctor, Schedule
+from data.doctor_model import Reg_Doctor, Schedule, ScheduleForUser
 from cfg import HOST, admin_id, PORT
 from data.news import News
 from flask_restful import reqparse, abort, Api, Resource
@@ -178,17 +178,24 @@ def change_doctor_data(doc_id):
 
 
 @admin.route('/add_doctor_schedule/', methods=['POST', 'GET'])
+@login_required
 def add_schedule():
+    if current_user.is_authenticated:
+        if session['_user_id'] != admin_id:
+            abort(401)
+
     doctor_list = []
     db_sess = db_session.create_session()
     doctors_query = db_sess.query(Reg_Doctor).with_entities(Reg_Doctor.id, Reg_Doctor.name, Reg_Doctor.surname,
-                                                            Reg_Doctor.prof).filter(Reg_Doctor.is_active==True)
+                                                            Reg_Doctor.prof).filter(Reg_Doctor.is_active == True)
     for doctor in doctors_query:
         doctor_list.append(f'{doctor.name} {doctor.surname} - {doctor.prof}')
     form = DoctorScheduleForm()
     if form.validate_on_submit():
         if datetime.datetime.strptime(request.form['date'], '%Y-%m-%d') < datetime.datetime.today():
-            return render_template('doc_schedule.html', doctors_data=doctor_list, form=form, message='Дата не корректа, вы не можете добавить талоны в прошлое', is_auth=current_user.is_authenticated )
+            return render_template('doc_schedule.html', doctors_data=doctor_list, form=form,
+                                   message='Дата не корректа, вы не можете добавить талоны в прошлое',
+                                   is_auth=current_user.is_authenticated)
 
         tickets = get_schedule_list(
             [],
@@ -213,7 +220,25 @@ def add_schedule():
         return render_template('doc_schedule.html', doctors_data=doctor_list, form=form,
                                is_auth=current_user.is_authenticated, message='успешно')
 
-    return render_template('doc_schedule.html', doctors_data=doctor_list, form=form, is_auth=current_user.is_authenticated)
+    return render_template('doc_schedule.html', doctors_data=doctor_list, form=form,
+                           is_auth=current_user.is_authenticated)
+
+
+@admin.route('/clear_schedule')
+def clear_sch():
+    with db_session.create_session() as sess:
+        to_del = sess.query(Schedule).filter(Schedule.date < datetime.datetime.today().date()).all()
+        for i in to_del:
+            glob_del = sess.query(ScheduleForUser).filter(ScheduleForUser.schedule_id == i.id).first()
+            if glob_del is not None:
+                sess.delete(glob_del)
+            sess.delete(i)
+
+
+        sess.commit()
+    flash('успешно')
+    return redirect(url_for('admin.admin_index_page', is_auth=current_user.is_authenticated))
+
 
 
 class Doctor(Resource):
@@ -273,7 +298,6 @@ class Doctor(Resource):
             db_sess.delete(doctor_to_delete)
             db_sess.commit()
             return jsonify({'status': 'OK, доктор удален'})
-
         except:
             return jsonify({'status': 'нелья удалить дока, у него есть активные талоны.'})
 
