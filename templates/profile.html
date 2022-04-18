@@ -29,11 +29,27 @@
          </div>
     </div>
 </div>
-{% for i in info.values() %}
-<p></p>
 
+<hr>
 
-                    Талон на {{i.date}} в {{i.tickets}} ко врачу {{i.doc_fio}} профессии {{i.doc_prof}}
+<div class="row justify-content-start" style="margin-left: 4%">
+    <div class="col-12">
+        <h4>Ваши записи</h4>
+    </div>
+</div>
 
-{% endfor %}
+<div class="row justify-content-center">
+    {% for i in info.values() %}
+        <div class="col-12 col-sm-10 col-md-9 col-lg-8" style="margin-bottom: 2%">
+            <div class="card">
+                <div class="card-body">
+                    <h6>Дата: {{i.date}}</h6>
+                    <h6>Время: {{i.time}}</h6>
+                    <h6>ФИО Врача: {{i.doc_fio}}</h6>
+                    <h6>Профессия: {{i.doc_prof}}</h6>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
 {% endblock %}

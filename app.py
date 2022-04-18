@@ -114,7 +114,7 @@ def profile():
                 schedule_info[tickt_num] = {
                     'date': i.date,
                     'time': i.tickets,
-                    'doc_fio': f"{doc.name} {doc.middle_name} {doc.surname}",
+                    'doc_fio': f"{doc.surname} {doc.name} {doc.middle_name}",
                     'doc_prof': doc.prof
                 }
     print(schedule_info)
