@@ -11,15 +11,20 @@
          </div>
 
         <div class="col-12" style="margin-bottom: 5%">
+
             <select class="form-select" aria-label="Default select example" name="doc_choice" >
                 {% for opt in doctors_data %}
-                  <option>{{ opt }}</option>
+                  <option>{{ opt[-1] }} id: {{opt[0]}}</option>
                 {% endfor %}
             </select>
+
+
+
+
         </div>
         {{ form.hidden_tag() }}
         <div class="col-12" style="margin-bottom: 5%">
-            <input type="date" class="form-control" name="date" required/>
+            <input type="date" class="form-control" name="date"/>
         </div>
 
         <div class="col-12" style="margin-bottom: 5%">
