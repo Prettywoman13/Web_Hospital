@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="static/CSS/style.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://formden.com/static/cdn/bootstrap-iso.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker3.css"/>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <title>{{ title }}</title>
+</head>
+<body>
+
+
+{% if is_auth %}
+    <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('logout') }}">Выйти</a>
+              </li>
+
+
+{% endif %}
+<div class="table-responsive">
+    {% for date, ticket_inf in info.items() %}
+        <table class="table table-hover" style="width: 90%;" align="center">
+            <thead class="table-dark">
+                <tr>
+                    <th class="align-middle" scope="col">Дата: {{ date }}</th>
+                    <th class="align-middle" scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for inf in ticket_inf %}
+                    <tr>
+                        <td class="align-middle">{{ inf.time }}</td>
+                        <td><a role="button" class="btn btn-outline-primary btn-sm"
+                           href="{{ url_for('start_appointment',ticket_id = inf.id)}}">Начать приём</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endfor %}
+</div>
+
+</body>
+</html>

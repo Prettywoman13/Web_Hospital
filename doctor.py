@@ -1,20 +1,11 @@
-import base64
 from time import strftime
-
-import requests
-from flask import Flask, render_template, url_for, redirect, session, request, blueprints
-
-from admin import admin
+from flask import Flask, render_template, url_for, redirect
 from data.doctor_model import Reg_Doctor, Schedule, ScheduleForUser
-from cfg import HOST, DOCTOR_PORT, DOCTOR_HOST
+from cfg import DOCTOR_PORT, DOCTOR_HOST
 from data import db_session
-from data.news import News
 from data.reg_users import Reg_User
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-
 from forms.doctor_login_form import DoctorLoginForm
-from forms.login import LoginForm
-from forms.registration import RegistraionForm
 from forms.form_error import FormError
 
 app_doc = Flask('doctor')
@@ -70,38 +61,38 @@ def index():
         all_ticket = session.query(Schedule).filter(Schedule.doc_id == current_user.id).all()
         for info in all_ticket:
             if info.state == 'disable':
-                user_id = session.query(ScheduleForUser).filter(ScheduleForUser.schedule_id == info.id).first().user_id
-                print(user_id)
-                client_info = session.query(Reg_User).filter(Reg_User.id == user_id).first()
-                print(info.date)
                 try:
-                    info_to_load[info.date.strftime("%m/%d/%Y")].append(
-                        {
-                            'name': client_info.name,
-                            'patronymic': client_info.patronymic,
-                            'snils': client_info.snils,
-                            'oms_number': client_info.oms_number,
-                            'surname': client_info.surname,
-                            'email': client_info.email,
-                            'phone_number': client_info.phone_number,
-                            'oms_series': client_info.oms_series})
-
-                except KeyError:
-                   info_to_load[strftime(info.date.strftime("%%m/%d/%Y"))] = []
-                   info_to_load[strftime(info.date.strftime("%m/%d/%Y"))].append(
+                   info_to_load[info.date.strftime("%m/%d/%Y")].append(
                        {
-                           'name': client_info.name,
-                           'patronymic': client_info.patronymic,
-                           'snils': client_info.snils,
-                           'oms_number': client_info.oms_number,
-                           'surname': client_info.surname,
-                           'email': client_info.email,
-                           'phone_number': client_info.phone_number,
-                           'oms_series': client_info.oms_series})
+                           'id': info.id,
+                           'time': info.tickets.strftime("%H:%M")
+                       }
+                   )
+                except KeyError:
+                    info_to_load[info.date.strftime("%m/%d/%Y")] = [{
+                            'id': info.id,
+                            'time': info.tickets.strftime("%H:%M")
+                        }]
+
+    return render_template('doc_index.html', info=info_to_load, is_auth=current_user.is_authenticated)
 
 
-    return info_to_load
+@app_doc.route('/start_appointment/<int:ticket_id>')
+def start_appointment(ticket_id):
+    with db_session.create_session() as sess:
+        user = sess.query(ScheduleForUser).filter(ScheduleForUser.schedule_id == ticket_id).first().user_id
+        client_info = sess.query(Reg_User).filter(Reg_User.id == user).first()
+        data = {
+            'name': client_info.name,
+            'patronymic': client_info.patronymic,
+            'snils': client_info.snils,
+            'oms_number': client_info.oms_number,
+            'surname': client_info.surname,
+            'email': client_info.email,
+            'phone_number': client_info.phone_number,
+            'oms_series': client_info.oms_series}
 
+    return render_template('start_appointment.html', user=data)
 
 @app_doc.errorhandler(401)
 def unlogin_user(e):
