@@ -39,7 +39,7 @@
 </div>
 
 <div class="row justify-content-center">
-    {% for i in info.values() %}
+    {% for i in info %}
         <div class="col-12 col-sm-10 col-md-9 col-lg-8" style="margin-bottom: 2%">
             <div class="card">
                 <div class="card-body">
@@ -48,7 +48,7 @@
                     <h6>ФИО Врача: {{i.doc_fio}}</h6>
                     <h6>Профессия: {{i.doc_prof}}</h6>
                     <a role="button" class="btn btn-outline-primary btn-sm"
-                                   href="{{ url_for('cancel_ticket',ticket_id = i.id)}}">Записаться</a>
+                                   href="{{ url_for('cancel_ticket',ticket_id = i.id)}}">Отменить талон</a>
                 </div>
             </div>
         </div>

@@ -35,8 +35,8 @@ doctor_api_parser.add_argument('img')
 doctor_api_parser.add_argument('is_active')
 
 
-@login_required
 @admin.route("/", methods=['GET', 'POST'])
+@login_required
 def admin_index_page():
     if current_user.is_authenticated:
         if session['_user_id'] != admin_id:
@@ -51,8 +51,8 @@ def admin_index_page():
     abort(401)
 
 
-@login_required
 @admin.route("/add_news", methods=['GET', 'POST'])
+@login_required
 def create_news_page():
     if current_user.is_authenticated:
         if session['_user_id'] != admin_id:
@@ -92,6 +92,7 @@ def show_doctors():
 
 
 @admin.route('/delete_doctor/<int:doc_id>', methods=['GET'])
+@login_required
 def del_doctor(doc_id):
     res = delete(f'http://{HOST}:{PORT}/admin/doctor_api/{doc_id}')
     print(res.json())
@@ -99,8 +100,8 @@ def del_doctor(doc_id):
     return redirect(url_for('admin.admin_index_page'))
 
 
-@login_required
 @admin.route('/add_doctor', methods=['GET', 'POST'])
+@login_required
 def create_doctor():
     if current_user.is_authenticated:
         if session['_user_id'] != admin_id:
@@ -132,8 +133,9 @@ def create_doctor():
     abort(401)
 
 
-@login_required
+
 @admin.route('/update_doctor/<int:doc_id>', methods=['GET', 'POST'])
+@login_required
 def change_doctor_data(doc_id):
     if current_user.is_authenticated:
         if session['_user_id'] != admin_id:
@@ -196,7 +198,6 @@ def add_schedule():
             return render_template('doc_schedule.html', doctors_data=doctor_list, form=form,
                                    message='Дата не корректа, вы не можете добавить талоны в прошлое',
                                    is_auth=current_user.is_authenticated)
-
         tickets = get_schedule_list(
             [],
             form.worktime_from.data,
@@ -225,6 +226,7 @@ def add_schedule():
 
 
 @admin.route('/clear_schedule')
+@login_required
 def clear_sch():
     with db_session.create_session() as sess:
         to_del = sess.query(Schedule).filter(Schedule.date < datetime.datetime.today().date()).all()
@@ -238,7 +240,6 @@ def clear_sch():
         sess.commit()
     flash('успешно')
     return redirect(url_for('admin.admin_index_page', is_auth=current_user.is_authenticated))
-
 
 
 class Doctor(Resource):

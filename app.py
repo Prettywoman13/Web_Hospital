@@ -103,27 +103,25 @@ def registration():
 @login_required
 def profile():
     user = current_user
-    schedule_info = {}
-    print('123')
+    schedule_info = []
     # некрасаивый кусок кода, сюда лучше не смотреть )
     with db_session.create_session() as sess:
         user_tickets = sess.query(ScheduleForUser).filter(ScheduleForUser.user_id == user.id).all()
-        print(user_tickets)
         user_tickets = [x.schedule_id for x in user_tickets]
         all_tickets = sess.query(Schedule).all()
         for tickt_num, i in enumerate(all_tickets):
             if i.id in user_tickets and i.date >= datetime.datetime.today().date():
                 doc = sess.query(Reg_Doctor).filter(Reg_Doctor.id == i.doc_id).first()
-                schedule_info[tickt_num] = {
+                schedule_info.append({
                     'id': i.id,
                     'date': i.date,
                     'time': i.tickets,
                     'doc_fio': f"{doc.surname} {doc.name} {doc.middle_name}",
                     'doc_prof': doc.prof
-                }
-    print(schedule_info)
-    return render_template('profile.html', user=user, is_auth=current_user.is_authenticated,
-                           is_admin=session['_user_id'] == admin_id, info=schedule_info)
+                })
+    schedule_info = sorted(schedule_info, key=lambda x: (x['date'], x['time']))
+
+    return render_template('profile.html', user=user, is_auth=current_user.is_authenticated, is_admin=session['_user_id'] == admin_id, info=schedule_info)
 
 
 @app.route("/")
@@ -194,7 +192,9 @@ def get_ticket(doc_id):
             info_for_user[i.date.strftime("%D")] = []
             info_for_user[i.date.strftime("%D")].append(
                 {'time': i.tickets.strftime("%H:%M"), 'id': i.id})
-    return render_template('get_ticket.html', is_auth=current_user.is_authenticated, tickets=info_for_user)
+
+    return render_template('get_ticket.html', is_auth=current_user.is_authenticated,
+                           tickets=dict(sorted(info_for_user.items(), key=lambda item: item)))
 
 
 @app.route('/get_ticket_submit/<int:ticket_id>', methods=['POST', 'GET'])
@@ -227,7 +227,8 @@ def cancel_ticket(ticket_id):
         except UnmappedInstanceError:
             pass
 
-    return '123'
+    flash('Талон отменён')
+    return redirect(url_for('profile'))
 
 
 @app.errorhandler(401)
