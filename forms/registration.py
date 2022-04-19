@@ -59,6 +59,6 @@ class RegistraionForm(FlaskForm):
     middle_name = StringField('Отчество', validators=[DataRequired()])
     snils = IntegerField('СНИЛС', validators=[DataRequired()])
     number_phone = TelField('Номер телефона', validators=[DataRequired(), validate_number_phone])
-    series_oms = IntegerField('Серия полиса ОМС (необязательно)'    )
+    series_oms = IntegerField('Серия полиса ОМС (необязательно)')
     number_oms = IntegerField('Номер полиса ОМС', validators=[DataRequired()])
     submit = SubmitField('Зарегестрироваться')

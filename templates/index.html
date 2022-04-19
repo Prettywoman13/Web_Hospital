@@ -49,6 +49,10 @@
                     {% if nw.image != "" %}
                         <img src="data:image/png;base64,{{nw.image}}">
                     {% endif %}
+                    {% if is_admin %}
+
+                        <a class="nav-link" href="{{ url_for('del_news', news_id = nw.id) }}">Удалить</a>
+                    {% endif %}
                 </div>
             </div>
         </div>

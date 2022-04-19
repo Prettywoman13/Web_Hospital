@@ -130,6 +130,7 @@ def index():
     session['url'] = url_for('index')
     db_sess = db_session.create_session()
     news = db_sess.query(News).all()[-1:-6:-1]
+
     for i in news:
         i.image = base64.b64encode(i.image).decode("utf-8")
 
@@ -229,6 +230,15 @@ def cancel_ticket(ticket_id):
 
     flash('Талон отменён')
     return redirect(url_for('profile'))
+
+
+@app.route('/del_news/<int:news_id>')
+def del_news(news_id):
+    with db_session.create_session() as sess:
+        ntd = sess.query(News).filter(News.id == news_id).first()
+        sess.delete(ntd)
+        sess.commit()
+    return redirect(url_for('index'))
 
 
 @app.errorhandler(401)
