@@ -13,6 +13,16 @@
 <body>
 
 
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
 {% if is_auth %}
 
     <div class="d-grid gap-3 col-2 mx-left" style="margin: 2% 78%">
