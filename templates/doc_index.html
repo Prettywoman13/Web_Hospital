@@ -14,9 +14,12 @@
 
 
 {% if is_auth %}
-    <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('logout') }}">Выйти</a>
-              </li>
+
+    <div class="d-grid gap-3 col-2 mx-left" style="margin: 2% 78%">
+         <a role="button" class="btn btn-primary"
+            href="{{ url_for('logout') }}">Выйти
+         </a>
+    </div>
 
 
 {% endif %}
@@ -34,7 +37,7 @@
                     <tr>
                         <td class="align-middle">{{ inf.time }}</td>
                         <td><a role="button" class="btn btn-outline-primary btn-sm"
-                           href="{{ url_for('start_appointment',ticket_id = inf.id)}}">Начать приём</a></td>
+                           href="{{ url_for('start_appointment',ticket_id = inf.id)}}" target="_blank">Начать приём</a></td>
                     </tr>
                 {% endfor %}
             </tbody>

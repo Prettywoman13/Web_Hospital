@@ -186,13 +186,14 @@ def get_ticket(doc_id):
     for i in tickets:
         try:
 
-            info_for_user[i.date.strftime("%D")].append(
+            info_for_user[i.date.strftime("%d.%m.%Y")].append(
                 {'time': i.tickets.strftime("%H:%M"), 'id': i.id})
 
         except KeyError:
-            info_for_user[i.date.strftime("%D")] = []
-            info_for_user[i.date.strftime("%D")].append(
+            info_for_user[i.date.strftime("%d.%m.%Y")] = []
+            info_for_user[i.date.strftime("%d.%m.%Y")].append(
                 {'time': i.tickets.strftime("%H:%M"), 'id': i.id})
+
 
     return render_template('get_ticket.html', is_auth=current_user.is_authenticated,
                            tickets=dict(sorted(info_for_user.items(), key=lambda item: item)))

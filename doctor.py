@@ -62,14 +62,14 @@ def index():
         for info in all_ticket:
             if info.state == 'disable':
                 try:
-                   info_to_load[info.date.strftime("%m/%d/%Y")].append(
+                   info_to_load[info.date.strftime("%d.%m.%Y")].append(
                        {
                            'id': info.id,
                            'time': info.tickets.strftime("%H:%M")
                        }
                    )
                 except KeyError:
-                    info_to_load[info.date.strftime("%m/%d/%Y")] = [{
+                    info_to_load[info.date.strftime("%d.%m.%Y")] = [{
                             'id': info.id,
                             'time': info.tickets.strftime("%H:%M")
                         }]
