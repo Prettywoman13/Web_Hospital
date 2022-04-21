@@ -25,6 +25,7 @@ doc_states = {
     'False': False
 }
 doctor_api_parser = reqparse.RequestParser()
+doctor_api_parser.add_argument('is_active')
 doctor_api_parser.add_argument('login')
 doctor_api_parser.add_argument('password')
 doctor_api_parser.add_argument('name')
@@ -32,7 +33,7 @@ doctor_api_parser.add_argument('middle_name')
 doctor_api_parser.add_argument('surname')
 doctor_api_parser.add_argument('prof')
 doctor_api_parser.add_argument('img')
-doctor_api_parser.add_argument('is_active')
+
 
 
 @admin.route("/", methods=['GET', 'POST'])
@@ -161,7 +162,7 @@ def change_doctor_data(doc_id):
                               'middle_name': form.middle_name.data,
                               'surname': form.surname.data,
                               'prof': form.prof.data,
-                              'is_active': str(form.is_active.data)
+                              'is_active': form.is_active.data
                           })
                 else:
                     patch(f'http://{HOST}:{PORT}/admin/doctor_api/{doc_id}',
@@ -170,7 +171,8 @@ def change_doctor_data(doc_id):
                             'middle_name': form.middle_name.data,
                             'surname': form.surname.data,
                             'prof': form.prof.data,
-                            'img': str(img)
+                            'img': str(img),
+                            'is_active': form.is_active.data
                           })
                 flash('Данные изменены')
                 return redirect(url_for('admin.admin_index_page'))
@@ -288,10 +290,10 @@ class Doctor(Resource):
         doctor_data.surname = all_args['surname']
         doctor_data.middle_name = all_args['middle_name']
         doctor_data.prof = all_args['prof']
+        doctor_data.is_active = doc_states[all_args['is_active']]
         if all_args['img']:
             img = bytes(all_args['img'], encoding='utf-8')[2:-1]
             doctor_data.image = img
-        doctor_data.is_active = doc_states[all_args['is_active']]
         db_sess.commit()
         return jsonify({'success': 'OK'})
 
