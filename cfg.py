@@ -1,5 +1,5 @@
 HOST = '0.0.0.0.'
-PORT = '443'
+PORT = '8080'
 admin_id = '1'
 DOCTOR_HOST = '0.0.0.0.'
-DOCTOR_PORT = '443'
+DOCTOR_PORT = '8080'
