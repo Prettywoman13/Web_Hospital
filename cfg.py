@@ -1,5 +1,5 @@
 HOST = '0.0.0.0.'
-PORT = '8030'
+PORT = process.env.PORT
 admin_id = '1'
 DOCTOR_HOST = '0.0.0.0.'
-DOCTOR_PORT = '8010'
+DOCTOR_PORT = process.env.PORT
