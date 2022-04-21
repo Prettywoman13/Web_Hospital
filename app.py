@@ -1,5 +1,6 @@
 import base64
 import datetime
+import os
 
 import requests
 from flask import Flask, render_template, url_for, redirect, session, request, blueprints, flash
@@ -25,7 +26,9 @@ app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 
 def main():
     db_session.global_init("db/users.db")
-    app.run(debug=True, port=PORT, host=HOST)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
+
 
 
 @login_manager.user_loader
