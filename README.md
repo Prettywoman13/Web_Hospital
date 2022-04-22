@@ -12,6 +12,7 @@
 </p>
 
 <h3>Результат для app.py</h3>
+
 ![](app_readme.png)
 
 <h3>Результат для doctor.py</h3>
