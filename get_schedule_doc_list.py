@@ -4,7 +4,7 @@ from datetime import date
 
 
 def get_schedule_list(time_list: list, start_time: object, end_time: object, lunch_start: object, lunch_end: object, delim: object) -> object:
-    '''Фунция для получения талонов, на вход принимает list куда сохранять талоны,
+    ''' Фунция для получения талонов, на вход принимает list куда сохранять талоны,
     начальное время(формат времени библы datetime(далее он используется везде)),
      конечное время приема, время начало обеда, время окончания обеда, время на один прием  '''
     if start_time >= end_time:
