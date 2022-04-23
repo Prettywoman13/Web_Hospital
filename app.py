@@ -244,6 +244,7 @@ def cancel_ticket(ticket_id):
 
 
 @app.route('/del_news/<int:news_id>')
+@login_required
 def del_news(news_id):
     '''Удаление новости по ее id'''
     with db_session.create_session() as sess:
